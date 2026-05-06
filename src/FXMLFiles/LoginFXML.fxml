@@ -1,0 +1,61 @@
+x<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="mapademo.LoginFXMLController">
+
+    <stylesheets>
+        <URL value="@loginfxml.css"/>
+    </stylesheets>
+
+    <children>
+
+        <Label layoutX="230" layoutY="20"
+               text="Registro Usuario"
+               style="-fx-font-size:20;" />
+
+        <TextField fx:id="txtNick"
+                   layoutX="180" layoutY="70"
+                   prefWidth="220"
+                   promptText="Nickname" />
+
+        <TextField fx:id="txtEmail"
+                   layoutX="180" layoutY="110"
+                   prefWidth="220"
+                   promptText="Correo" />
+
+        <PasswordField fx:id="txtPass"
+                       layoutX="180" layoutY="150"
+                       prefWidth="220"
+                       promptText="Contraseña" />
+
+        <DatePicker fx:id="dpFecha"
+                    layoutX="180" layoutY="190"
+                    prefWidth="220" />
+
+        <Button layoutX="180" layoutY="235"
+                text="Seleccionar Avatar"
+                onAction="#seleccionarAvatar" />
+
+        <Label fx:id="lblAvatar"
+               layoutX="340" layoutY="240"
+               text="Sin avatar" />
+
+        <Button layoutX="240" layoutY="290"
+                text="Registrarse"
+                onAction="#registrarUsuario" />
+
+        <Label fx:id="lblResultado"
+               layoutX="160" layoutY="340"
+               prefWidth="300" />
+
+    </children>
+
+</AnchorPane>
