@@ -41,7 +41,7 @@
                   <Label text="🏃 DISTANCIA" textFill="#64748b">
                      <font><Font name="System Bold" size="10.0" /></font>
                   </Label>
-                  <Label text="42.2 km" textFill="#2196F3">
+                  <Label text="42.2 km" textFill="#ff2b2b">
                      <font><Font name="System Bold" size="22.0" /></font>
                   </Label>
                </children>
@@ -53,7 +53,7 @@
                   <Label text="⏱️ TIEMPO TOTAL" textFill="#64748b">
                      <font><Font name="System Bold" size="10.0" /></font>
                   </Label>
-                  <Label text="12h 30m" textFill="#2196F3">
+                  <Label text="12h 30m" textFill="#ff2b2b">
                      <font><Font name="System Bold" size="22.0" /></font>
                   </Label>
                </children>
@@ -65,7 +65,7 @@
                   <Label text="⛰️ DESNIVEL TOTAL" textFill="#64748b">
                      <font><Font name="System Bold" size="10.0" /></font>
                   </Label>
-                  <Label text="+ 546 m" textFill="#2196f3">
+                  <Label text="+ 546 m" textFill="#ff6666">
                      <font><Font name="System Bold" size="22.0" /></font>
                   </Label>
                </children>
@@ -77,7 +77,7 @@
                   <Label text="🗺️ RUTAS COMPLETAS" textFill="#64748b">
                      <font><Font name="System Bold" size="10.0" /></font>
                   </Label>
-                  <Label text="15" textFill="#2196F3">
+                  <Label text="15" textFill="#ff6666">
                      <font><Font name="System Bold" size="22.0" /></font>
                   </Label>
                </children>
