@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="480.0" spacing="20.0" style="-fx-background-color: white; -fx-background-radius: 24; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 20, 0, 0, 10);" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+   <padding>
+      <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+   </padding>
+   <children>
+      <VBox alignment="CENTER" spacing="5.0">
+         <children>
+            <Label text="Historial de Sesiones" textFill="#0f172a">
+               <font><Font name="System Bold" size="24.0" /></font>
+            </Label>
+            <Label text="Registro de tu actividad running en la plataforma" textFill="#64748b" />
+         </children>
+      </VBox>
+
+      <GridPane hgap="15.0" vgap="15.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <VBox prefWidth="200.0" spacing="5.0" style="-fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 12;" GridPane.columnIndex="0">
+               <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+               <children>
+                  <Label text="💻 SESIONES TOTALES" textFill="#64748b">
+                     <font><Font name="System Bold" size="10.0" /></font>
+                  </Label>
+                  <Label text="42" textFill="#2196F3">
+                     <font><Font name="System Bold" size="22.0" /></font>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox prefWidth="200.0" spacing="5.0" style="-fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 12;" GridPane.columnIndex="1">
+               <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+               <children>
+                  <Label text="⏱️ TIEMPO EN APP" textFill="#64748b">
+                     <font><Font name="System Bold" size="10.0" /></font>
+                  </Label>
+                  <Label text="18h 45m" textFill="#2196f3">
+                     <font><Font name="System Bold" size="22.0" /></font>
+                  </Label>
+               </children>
+            </VBox>
+         </children>
+      </GridPane>
+
+      <VBox spacing="10.0">
+         <children>
+            <Label text="REGISTROS RECIENTES" textFill="#1e293b">
+               <font><Font name="System Bold" size="13.0" /></font>
+            </Label>
+            
+            <ScrollPane hbarPolicy="NEVER" prefHeight="220.0" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+               <content>
+                  <VBox prefWidth="410.0" spacing="10.0" style="-fx-background-color: white;">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" spacing="15.0" style="-fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+                           <padding><Insets bottom="12.0" left="15.0" right="15.0" top="12.0" /></padding>
+                           <children>
+                              <Label text="📅"><font><Font size="24.0" /></font></Label>
+                              <VBox HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label text="Hoy, 10:30 AM" textFill="#0f172a"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                    <Label text="Duración: 45 min" textFill="#64748b"><font><Font size="12.0" /></font></Label>
+                                 </children>
+                              </VBox>
+                              <VBox alignment="CENTER_RIGHT">
+                                 <children>
+                                    <Label text="+2 Rutas" textFill="#2196F3"><font><Font name="System Bold" size="12.0" /></font></Label>
+                                    <Label text="3 Anotaciones" textFill="#64748b"><font><Font size="12.0" /></font></Label>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+
+                        <HBox alignment="CENTER_LEFT" spacing="15.0" style="-fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+                           <padding><Insets bottom="12.0" left="15.0" right="15.0" top="12.0" /></padding>
+                           <children>
+                              <Label text="📅"><font><Font size="24.0" /></font></Label>
+                              <VBox HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label text="Ayer, 18:15 PM" textFill="#0f172a"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                    <Label text="Duración: 1h 20m" textFill="#64748b"><font><Font size="12.0" /></font></Label>
+                                 </children>
+                              </VBox>
+                              <VBox alignment="CENTER_RIGHT">
+                                 <children>
+                                    <Label text="+1 Ruta" textFill="#2196F3"><font><Font name="System Bold" size="12.0" /></font></Label>
+                                    <Label text="0 Anotaciones" textFill="#64748b"><font><Font size="12.0" /></font></Label>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </content>
+            </ScrollPane>
+         </children>
+      </VBox>
+
+      <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="45.0" style="-fx-background-color: transparent; -fx-border-color: #2196F3; -fx-border-radius: 25; -fx-text-fill: #2196F3; -fx-font-weight: bold; -fx-cursor: hand;" text="CERRAR HISTORIAL" />
+   </children>
+</VBox>

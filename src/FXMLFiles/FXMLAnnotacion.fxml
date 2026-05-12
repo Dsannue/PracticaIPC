@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="521.0" prefWidth="364.0" spacing="15.0" style="-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-radius: 5; -fx-background-radius: 5;" stylesheets="@../resources/estilos.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mapademo.AnotacionController">
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+   </padding>
+   <children>
+      <VBox alignment="CENTER" spacing="8.0">
+         <children>
+            <Label text="Añadir Marcador" textFill="#0f172a">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label text="Personaliza tu punto de interés en la ruta" textFill="#64748b" />
+         </children>
+      </VBox>
+
+      <VBox spacing="5.0" style="-fx-background-radius: 12;">
+         <children>
+            <Label text="TIPO">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font></Label>
+            <HBox alignment="CENTER" prefHeight="64.0" prefWidth="289.0" spacing="10.0">
+               <children>
+                  <ToggleButton mnemonicParsing="false" prefHeight="50.0" prefWidth="65.0" style="-fx-background-radius: 12;" text="📍">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                     <toggleGroup>
+                        <ToggleGroup fx:id="annotacionType" />
+                     </toggleGroup>
+                  </ToggleButton>
+                  <ToggleButton maxWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="65.0" style="-fx-background-radius: 12;" text="➖" toggleGroup="$annotacionType" />
+                  <ToggleButton mnemonicParsing="false" prefHeight="50.0" prefWidth="65.0" style="-fx-background-radius: 12;" text="⭕" toggleGroup="$annotacionType" />
+                  <ToggleButton mnemonicParsing="false" prefHeight="50.0" prefWidth="65.0" style="-fx-background-radius: 12;" text="Aa" toggleGroup="$annotacionType" />
+               </children>
+               <VBox.margin>
+                  <Insets top="3.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+
+      <VBox spacing="5.0">
+         <children>
+            <Label text="COLOR">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font></Label>
+            <ColorPicker fx:id="colorPicker" maxWidth="1.7976931348623157E308" style="-fx-background-radius: 10; -fx-border-radius: 10;" />
+         </children>
+      </VBox>
+
+      <VBox spacing="5.0">
+         <children>
+            <Label text="NOTAS ADICIONALES">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font></Label>
+            <TextArea fx:id="textoAnotacion" prefHeight="80.0" promptText="Escribe aquí los detalles..." style="-fx-background-radius: 5;" wrapText="true" />
+         </children>
+         <VBox.margin>
+            <Insets top="10.0" />
+         </VBox.margin>
+      </VBox>
+
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="322.0" spacing="10.0">
+         <children>
+            <Button fx:id="btnCancelar" mnemonicParsing="false" onAction="#handleCancelar" prefHeight="59.0" prefWidth="123.0" style="-fx-background-color: transparent; -fx-text-fill: #64748b; -fx-font-weight: bold;" text="DESCARTAR" />
+            <Button fx:id="btnGuardar" mnemonicParsing="false" onAction="#handleGuardar" prefHeight="56.0" prefWidth="137.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25;" text="AÑADIR" />
+         </children>
+         <VBox.margin>
+            <Insets top="10.0" />
+         </VBox.margin>
+      </HBox>
+      
+   </children>
+</VBox>

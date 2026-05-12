@@ -41,6 +41,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
@@ -59,6 +60,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -66,6 +68,7 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import mapademo.Poi;
 
 /**
  * Controlador principal de la aplicación de mapa con POIs.
@@ -155,6 +158,24 @@ public class FXMLDocumentController implements Initializable {
     private Label mousePosition;
     @FXML
     private SplitPane splitPane;
+    @FXML
+    private Button btnMapChanger;
+    @FXML
+    private MenuItem profileMod;
+    @FXML
+    private StackPane leftPanelContainer;
+    @FXML
+    private VBox detailView;
+    @FXML
+    private Button btnAtras;
+    @FXML
+    private Button btnBorrarActividad;
+    @FXML
+    private VBox masterView;
+    @FXML
+    private Button btnAddActivity;
+    @FXML
+    private Button btnActAcumulation;
  
 
     // =========================================================
