@@ -50,7 +50,7 @@
             <VBox prefWidth="160.0" spacing="5.0" style="-fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 12;" GridPane.columnIndex="1" GridPane.rowIndex="0">
                <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
                <children>
-                  <Label text="⏱️ TIEMPO TOTAL" textFill="#64748b">
+                  <Label text="⏱ TIEMPO TOTAL" textFill="#64748b">
                      <font><Font name="System Bold" size="10.0" /></font>
                   </Label>
                   <Label text="12h 30m" textFill="#ff2b2b">
@@ -62,7 +62,7 @@
             <VBox prefWidth="160.0" spacing="5.0" style="-fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 12;" GridPane.columnIndex="0" GridPane.rowIndex="1">
                <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
                <children>
-                  <Label text="⛰️ DESNIVEL TOTAL" textFill="#64748b">
+                  <Label text="⛰ DESNIVEL TOTAL" textFill="#64748b">
                      <font><Font name="System Bold" size="10.0" /></font>
                   </Label>
                   <Label text="+ 546 m" textFill="#ff6666">
@@ -74,7 +74,7 @@
             <VBox prefWidth="160.0" spacing="5.0" style="-fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 12;" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
                <children>
-                  <Label text="🗺️ RUTAS COMPLETAS" textFill="#64748b">
+                  <Label text="🗺 RUTAS COMPLETAS" textFill="#64748b">
                      <font><Font name="System Bold" size="10.0" /></font>
                   </Label>
                   <Label text="15" textFill="#ff6666">
