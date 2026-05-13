@@ -40,7 +40,7 @@
                   <Label text="💻 SESIONES TOTALES" textFill="#64748b">
                      <font><Font name="System Bold" size="10.0" /></font>
                   </Label>
-                  <Label text="42" textFill="#2196F3">
+                  <Label text="42" textFill="#ff2b2b">
                      <font><Font name="System Bold" size="22.0" /></font>
                   </Label>
                </children>
@@ -51,7 +51,7 @@
                   <Label text="⏱️ TIEMPO EN APP" textFill="#64748b">
                      <font><Font name="System Bold" size="10.0" /></font>
                   </Label>
-                  <Label text="18h 45m" textFill="#2196f3">
+                  <Label text="18h 45m" textFill="#ff2b2b">
                      <font><Font name="System Bold" size="22.0" /></font>
                   </Label>
                </children>
@@ -81,7 +81,7 @@
                               </VBox>
                               <VBox alignment="CENTER_RIGHT">
                                  <children>
-                                    <Label text="+2 Rutas" textFill="#2196F3"><font><Font name="System Bold" size="12.0" /></font></Label>
+                                    <Label text="+2 Rutas" textFill="#ff6666"><font><Font name="System Bold" size="12.0" /></font></Label>
                                     <Label text="3 Anotaciones" textFill="#64748b"><font><Font size="12.0" /></font></Label>
                                  </children>
                               </VBox>
@@ -100,7 +100,7 @@
                               </VBox>
                               <VBox alignment="CENTER_RIGHT">
                                  <children>
-                                    <Label text="+1 Ruta" textFill="#2196F3"><font><Font name="System Bold" size="12.0" /></font></Label>
+                                    <Label text="+1 Ruta" textFill="#ff6666"><font><Font name="System Bold" size="12.0" /></font></Label>
                                     <Label text="0 Anotaciones" textFill="#64748b"><font><Font size="12.0" /></font></Label>
                                  </children>
                               </VBox>
