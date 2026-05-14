@@ -9,6 +9,7 @@
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.SplitPane?>
@@ -21,116 +22,127 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="626.0" prefWidth="827.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mapademo.FXMLDocumentController">
-   <center>
-      <VBox prefHeight="556.0" prefWidth="853.0" stylesheets="@../resources/estilos.css">
-         <children>
-            <SplitPane fx:id="splitPane" dividerPositions="0.25" VBox.vgrow="ALWAYS">
-               <items>
-                  <StackPane fx:id="leftPanelContainer" minWidth="200.0">
-                     <children>
-                        <VBox fx:id="detailView" spacing="10.0" style="-fx-background-color: white;" visible="false">
-                           <padding>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </padding>
-                           <children>
-                              <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                 <children>
-                                    <Button fx:id="btnAtras" mnemonicParsing="false" text="&lt; Atrás" />
-                                    <Label style="-fx-font-weight: bold;" text="Detalles de Ruta" />
-                                 </children>
-                              </HBox>
-                              <VBox spacing="8.0" VBox.vgrow="ALWAYS">
-                                 <children>
-                                    <Label text="Actividad: Carrera Nocturna" wrapText="true" />
-                                    <Label text="Distancia: 12.5 km" />
-                                    <Label text="Tiempo: 1h 05m" />
-                                    <Label text="Desnivel: +150m" />
-                                 </children>
-                              </VBox>
-                              <Button fx:id="btnBorrarActividad" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Borrar Actividad" textFill="RED" />
-                           </children>
-                        </VBox>
-                        <VBox fx:id="masterView" spacing="5.0" style="-fx-background-color: white;">
-                           <padding>
-                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                           </padding>
-                           <children>
-                              <Button fx:id="btnAddActivity" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="+ Añadir Actividad" />
-                              <ListView fx:id="map_listview" editable="true" onMouseClicked="#listClicked" prefHeight="399.0" prefWidth="87.0" VBox.vgrow="ALWAYS" />
-                              <Button fx:id="btnActAcumulation" mnemonicParsing="false" prefHeight="26.0" prefWidth="231.0" text="Acumulado de Actividad" />
-                           </children>
-                        </VBox>
-                     </children>
-                  </StackPane>
-                  <ScrollPane fx:id="map_scrollpane" hbarPolicy="ALWAYS" onMouseMoved="#showPosition" pannable="true" prefHeight="398.0" prefWidth="358.0" vbarPolicy="ALWAYS">
-                     <content>
-                        <Pane>
-                           <children>
-                              <ImageView pickOnBounds="true">
-                                 <image>
-                                    <Image url="@../resources/upv.jpg" />
-                                 </image>
-                              </ImageView>
-                           </children>
-                        </Pane>
-                     </content>
-                  </ScrollPane>
-               </items>
-            </SplitPane>
-         </children>
-      </VBox>
-   </center>
-   <top>
-      <HBox alignment="CENTER_RIGHT" fillHeight="false" spacing="5.0" BorderPane.alignment="CENTER">
-         <children>
-            <MenuBar>
-              <menus>
-                <Menu mnemonicParsing="false" text="Ayuda">
-                  <items>
-                    <MenuItem mnemonicParsing="false" onAction="#about" text="Acerca de" />
-                  </items>
-                </Menu>
-              </menus>
-            </MenuBar>
-            <Button fx:id="btnMapChanger" mnemonicParsing="false" onAction="#cambiarMapa" text="Cambiar mapa" />
-            <Region HBox.hgrow="ALWAYS" />
-            <Label text="Zoom" />
-            <Button mnemonicParsing="false" onAction="#zoomOut" text="-" />
-            <Slider fx:id="zoom_slider" HBox.hgrow="SOMETIMES" />
-            <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#zoomIn" text="+" />
-            <MenuButton cache="true" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false">
-               <items>
-                  <MenuItem fx:id="profileMod" mnemonicParsing="false" text="Modificar Perfil..." />
-                  <MenuItem mnemonicParsing="false" text="Historial de Sesion" />
-                  <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="Cerrar Sesion" />
-               </items>
-               <graphic>
-                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../resources/logo.png" />
-                     </image>
-                  </ImageView>
-               </graphic>
-               <HBox.margin>
-                  <Insets />
-               </HBox.margin>
-            </MenuButton>
-         </children>
-         <BorderPane.margin>
-            <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
-         </BorderPane.margin>
-      </HBox>
-   </top>
-   <bottom>
-      <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
-         <children>
-            <Label fx:id="mousePosition" minHeight="-Infinity" minWidth="-Infinity" text="SceneX:     ScenY:     " wrapText="true" HBox.hgrow="ALWAYS" />
-         </children>
-         <BorderPane.margin>
-            <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
-         </BorderPane.margin>
-      </HBox>
-   </bottom>
+<BorderPane prefHeight="626.0" prefWidth="827.0" style="-fx-background-color: #F8FAFC;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mapademo.FXMLDocumentController">
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: #2196F3; -fx-padding: 8 12 8 12;" BorderPane.alignment="CENTER">
+            <children>
+                <MenuBar style="-fx-background-color: rgba(255,255,255,0.18);">
+                    <menus>
+                        <Menu mnemonicParsing="false" style="-fx-text-fill: white; -fx-font-size: 13px;" text="Ayuda">
+                            <items>
+                                <MenuItem mnemonicParsing="false" onAction="#about" text="Acerca de" />
+                            </items>
+                        </Menu>
+                    </menus>
+                </MenuBar>
+                <Button fx:id="btnMapChanger" mnemonicParsing="false" onAction="#cambiarMapa" style="-fx-background-color: rgba(255,255,255,0.18); -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 6 12 6 12;" text="🗺  Cambiar Mapa" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Label style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 10px; -fx-font-weight: bold; -fx-letter-spacing: 1px;" text="ZOOM" />
+                <Button mnemonicParsing="false" onAction="#zoomOut" style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand; -fx-min-width: 30; -fx-min-height: 28; -fx-padding: 2 8 2 8;" text="−" />
+                <Slider fx:id="zoom_slider" prefWidth="110" style="-fx-control-inner-background: rgba(255,255,255,0.3); -fx-accent: white;" HBox.hgrow="SOMETIMES" />
+                <Button mnemonicParsing="false" onAction="#zoomIn" style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand; -fx-min-width: 30; -fx-min-height: 28; -fx-padding: 2 8 2 8;" text="+" />
+                <MenuButton cache="true" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" style="-fx-background-color: rgba(255,255,255,0.15); -fx-background-radius: 20; -fx-cursor: hand; -fx-padding: 4 8 4 8;">
+                    <items>
+                        <MenuItem fx:id="profileMod" mnemonicParsing="false" text="✏  Modificar Perfil..." />
+                        <MenuItem mnemonicParsing="false" text="📋  Historial de Sesión" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem mnemonicParsing="false" text="🚪  Cerrar Sesión" />
+                    </items>
+                    <graphic>
+                        <ImageView fitHeight="26.0" fitWidth="26.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../resources/logo.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </MenuButton>
+            </children>
+        </HBox>
+    </top>
+    <center>
+        <VBox prefHeight="556.0" prefWidth="853.0" style="-fx-background-color: #F8FAFC;" stylesheets="@../resources/estilos.css">
+            <children>
+                <SplitPane fx:id="splitPane" dividerPositions="0.25" style="-fx-background-color: #F8FAFC; -fx-box-border: transparent;" VBox.vgrow="ALWAYS">
+                    <items>
+                        <StackPane fx:id="leftPanelContainer" minWidth="200.0" style="-fx-background-color: white; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 8, 0, 2, 0);">
+                            <VBox fx:id="detailView" spacing="14.0" style="-fx-background-color: white;" visible="false">
+                                <padding>
+                                    <Insets bottom="16.0" left="14.0" right="14.0" top="14.0" />
+                                </padding>
+                                <children>
+                                    <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                        <children>
+                                            <Button fx:id="btnAtras" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: #2196F3; -fx-font-size: 12px; -fx-font-weight: bold; -fx-cursor: hand; -fx-border-color: #2196F3; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 4 10 4 10;" text="← Atrás" />
+                                            <Label style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2196F3;" text="Detalles de Ruta" />
+                                        </children>
+                                    </HBox>
+                                    <Separator style="-fx-background-color: #2196F3;" />
+                                    <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+                                        <children>
+                                            <VBox spacing="2.0">
+                                                <children>
+                                                    <Label style="-fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: #ff6666; -fx-letter-spacing: 1px;" text="ACTIVIDAD" />
+                                                    <Label style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #ff2b2b;" text="Carrera Nocturna" wrapText="true" />
+                                                </children>
+                                            </VBox>
+                                            <VBox spacing="2.0">
+                                                <children>
+                                                    <Label style="-fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: #ff6666; -fx-letter-spacing: 1px;" text="DISTANCIA" />
+                                                    <Label style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #ff2b2b;" text="12.5 km" />
+                                                </children>
+                                            </VBox>
+                                            <VBox spacing="2.0">
+                                                <children>
+                                                    <Label style="-fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: #ff6666; -fx-letter-spacing: 1px;" text="TIEMPO" />
+                                                    <Label style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #ff2b2b;" text="1h 05m" />
+                                                </children>
+                                            </VBox>
+                                            <VBox spacing="2.0">
+                                                <children>
+                                                    <Label style="-fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: #ff6666; -fx-letter-spacing: 1px;" text="DESNIVEL" />
+                                                    <Label style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #ff2b2b;" text="+150 m" />
+                                                </children>
+                                            </VBox>
+                                        </children>
+                                    </VBox>
+                                    <Button fx:id="btnBorrarActividad" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #ff2b2b; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 8 0 8 0;" text="🗑  Borrar Actividad" />
+                                </children>
+                            </VBox>
+                            <VBox fx:id="masterView" spacing="8.0" style="-fx-background-color: white;">
+                                <padding>
+                                    <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+                                </padding>
+                                <children>
+                                    <Label style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #ff6666; -fx-letter-spacing: 1.5px;" text="MIS ACTIVIDADES" />
+                                    <Button fx:id="btnAddActivity" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #ff6666; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 9 0 9 0;" text="＋  Añadir Actividad" />
+                                    <ListView fx:id="map_listview" editable="true" onMouseClicked="#listClicked" prefHeight="399.0" prefWidth="87.0" style="-fx-background-color: #F8FAFC; -fx-background-insets: 0; -fx-border-color: #e0e7ef; -fx-border-radius: 6; -fx-background-radius: 6;" VBox.vgrow="ALWAYS" />
+                                    <Button fx:id="btnActAcumulation" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="32.0" style="-fx-background-color: #ff6666; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 7 0 7 0;" text="📊  Acumulado de Actividad" />
+                                </children>
+                            </VBox>
+                        </StackPane>
+                        <ScrollPane fx:id="map_scrollpane" hbarPolicy="ALWAYS" onMouseMoved="#showPosition" pannable="true" prefHeight="398.0" prefWidth="358.0" style="-fx-background-color: #e8f0f7; -fx-background: #e8f0f7; -fx-border-color: transparent;" vbarPolicy="ALWAYS">
+                            <content>
+                                <Pane style="-fx-background-color: #e8f0f7;">
+                                    <children>
+                                        <ImageView pickOnBounds="true">
+                                            <image>
+                                                <Image url="@../resources/upv.jpg" />
+                                            </image>
+                                        </ImageView>
+                                    </children>
+                                </Pane>
+                            </content>
+                        </ScrollPane>
+                    </items>
+                </SplitPane>
+            </children>
+        </VBox>
+    </center>
+    <bottom>
+        <HBox alignment="CENTER_LEFT" style="-fx-background-color: #2196F3; -fx-padding: 4 12 4 12;" BorderPane.alignment="CENTER">
+            <children>
+                <Label fx:id="mousePosition" minHeight="-Infinity" minWidth="-Infinity" style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 11px; -fx-font-family: 'Courier New';" text="SceneX: —     SceneY: —" wrapText="true" HBox.hgrow="ALWAYS" />
+            </children>
+        </HBox>
+    </bottom>
 </BorderPane>
