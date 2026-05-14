@@ -31,9 +31,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.Set;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -536,14 +539,18 @@ public class FXMLDocumentController implements Initializable {
     }
 
     private void bindCloseActions(Parent popupRoot, String... closeButtonLabels) {
+        Set<String> closeLabels = new HashSet<>(Arrays.asList(closeButtonLabels));
         List<Button> buttons = new ArrayList<>();
         collectButtons(popupRoot, buttons);
         for (Button button : buttons) {
-            for (String label : closeButtonLabels) {
-                if (label.equals(button.getText())) {
-                    button.setOnAction(e -> hidePopup());
-                    break;
-                }
+            if (button.getText() != null && closeLabels.contains(button.getText())) {
+                final javafx.event.EventHandler<ActionEvent> existingHandler = button.getOnAction();
+                button.setOnAction(e -> {
+                    if (existingHandler != null) {
+                        existingHandler.handle(e);
+                    }
+                    hidePopup();
+                });
             }
         }
     }
