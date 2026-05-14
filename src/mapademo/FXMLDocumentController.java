@@ -30,6 +30,8 @@ package mapademo;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.animation.KeyFrame;
@@ -37,9 +39,12 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -59,6 +64,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -163,6 +169,10 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private MenuItem profileMod;
     @FXML
+    private MenuItem sessionHistoryItem;
+    @FXML
+    private MenuItem logoutItem;
+    @FXML
     private StackPane leftPanelContainer;
     @FXML
     private VBox detailView;
@@ -176,6 +186,12 @@ public class FXMLDocumentController implements Initializable {
     private Button btnAddActivity;
     @FXML
     private Button btnActAcumulation;
+    @FXML
+    private BorderPane mainContent;
+    @FXML
+    private StackPane overlayLayer;
+    @FXML
+    private StackPane popupHost;
  
 
     // =========================================================
@@ -466,6 +482,81 @@ public class FXMLDocumentController implements Initializable {
         // ── Carga del mapa inicial ─────────────────────────────────────
         // El fichero se busca relativo al directorio de trabajo del proyecto.
         buildMap(new File("maps/upv.jpg"));
+
+        // ── Popups en overlay sobre la escena principal ────────────────
+        profileMod.setOnAction(e -> showPopup(
+            "/FXMLFiles/FXMLProfileModify.fxml",
+            "DESCARTAR", "GUARDAR"
+        ));
+
+        sessionHistoryItem.setOnAction(e -> showPopup(
+            "/FXMLFiles/FXMLSessionHistory.fxml",
+            "CERRAR HISTORIAL"
+        ));
+
+        logoutItem.setOnAction(e -> showPopup(
+            "/FXMLFiles/FXMLDoubleCheckLogOut.fxml",
+            "CANCELAR", "CERRAR"
+        ));
+
+        btnActAcumulation.setOnAction(e -> showPopup(
+            "/FXMLFiles/FXMLAccumulatedActivity.fxml",
+            "CERRAR"
+        ));
+
+        btnBorrarActividad.setOnAction(e -> showPopup(
+            "/FXMLFiles/FXMLDoubleCheckDelete.fxml",
+            "CANCELAR", "ELIMINAR"
+        ));
+    }
+
+    private void showPopup(String fxmlPath, String... closeButtonLabels) {
+        try {
+            Parent popupContent = FXMLLoader.load(getClass().getResource(fxmlPath));
+            bindCloseActions(popupContent, closeButtonLabels);
+            popupHost.getChildren().setAll(popupContent);
+            overlayLayer.setManaged(true);
+            overlayLayer.setVisible(true);
+            mainContent.setDisable(true);
+            mapContextMenu.hide();
+        } catch (IOException ex) {
+            Alert error = new Alert(Alert.AlertType.ERROR);
+            error.setTitle("Error");
+            error.setHeaderText("No se pudo abrir el popup");
+            error.setContentText("No se pudo cargar: " + fxmlPath);
+            error.showAndWait();
+        }
+    }
+
+    private void hidePopup() {
+        popupHost.getChildren().clear();
+        overlayLayer.setVisible(false);
+        overlayLayer.setManaged(false);
+        mainContent.setDisable(false);
+    }
+
+    private void bindCloseActions(Parent popupRoot, String... closeButtonLabels) {
+        List<Button> buttons = new ArrayList<>();
+        collectButtons(popupRoot, buttons);
+        for (Button button : buttons) {
+            for (String label : closeButtonLabels) {
+                if (label.equals(button.getText())) {
+                    button.setOnAction(e -> hidePopup());
+                    break;
+                }
+            }
+        }
+    }
+
+    private void collectButtons(Parent root, List<Button> buttons) {
+        for (Node node : root.getChildrenUnmodifiable()) {
+            if (node instanceof Button) {
+                buttons.add((Button) node);
+            }
+            if (node instanceof Parent) {
+                collectButtons((Parent) node, buttons);
+            }
+        }
     }
 
     // =========================================================
