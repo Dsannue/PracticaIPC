@@ -15,13 +15,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mapademo.AuthController">
+<HBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mapademo.AuthController">
    <children>
-      <StackPane prefHeight="720.0" prefWidth="640.0" style="-fx-background-color: #0f172a;">
+      <StackPane prefHeight="720.0" prefWidth="640.0" style="-fx-background-color: #0f172a;" HBox.hgrow="ALWAYS">
          <children>
-            <ImageView fitHeight="720.0" fitWidth="640.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="720.0" fitWidth="640.0" opacity="0.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../resources/hero_runner.jpg" />
+                  <Image url="@../resources/logo.png" />
                </image>
             </ImageView>
             <Pane opacity="0.4" style="-fx-background-color: linear-gradient(to right, rgba(15, 23, 42, 0.8), transparent);" />
@@ -50,9 +50,9 @@
             </VBox>
          </children>
       </StackPane>
-      <StackPane prefHeight="720.0" prefWidth="640.0" style="-fx-background-color: white;">
+      <StackPane prefHeight="720.0" prefWidth="640.0" style="-fx-background-color: white;" HBox.hgrow="ALWAYS">
          <children>
-            <VBox alignment="CENTER" maxWidth="650.0" prefHeight="720.0" prefWidth="613.0" spacing="20.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+            <VBox alignment="CENTER" prefHeight="720.0" prefWidth="613.0" spacing="20.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" visible="false">
                <padding>
                   <Insets bottom="40.0" left="30.0" right="30.0" top="40.0" />
                </padding>
@@ -81,7 +81,7 @@
                                     <Font name="System Bold" size="13.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="usernameField" maxWidth="-Infinity" prefHeight="35.0" prefWidth="597.0" promptText="Introduce tu usuario" style="-fx-background-radius: 25;" styleClass="campo" />
+                              <TextField fx:id="usernameField" prefHeight="35.0" prefWidth="597.0" promptText="Introduce tu usuario" style="-fx-background-radius: 25;" styleClass="campo" />
                            </children>
                         </VBox>
                         <VBox spacing="5.0">
@@ -91,7 +91,7 @@
                                     <Font name="System Bold" size="13.0" />
                                  </font>
                               </Label>
-                              <PasswordField fx:id="passwordField" maxWidth="-Infinity" prefHeight="35.0" prefWidth="668.0" promptText="Introduce tu contraseña" style="-fx-background-radius: 25;" styleClass="campo" />
+                              <PasswordField fx:id="passwordField" prefHeight="35.0" prefWidth="668.0" promptText="Introduce tu contraseña" style="-fx-background-radius: 25;" styleClass="campo" />
                            </children>
                            <VBox.margin>
                               <Insets top="10.0" />
@@ -114,7 +114,7 @@
                   </VBox>
                </children>
             </VBox>
-            <VBox fx:id="registerForm" alignment="CENTER" prefHeight="720.0" prefWidth="585.0" spacing="25.0" visible="false">
+            <VBox fx:id="registerForm" alignment="CENTER" prefHeight="720.0" prefWidth="585.0" spacing="25.0">
                <padding>
                   <Insets left="100.0" right="100.0" />
                </padding>
@@ -138,7 +138,8 @@
                                     <Font name="System Bold" size="10.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="txtRegUser" prefHeight="45.0" promptText="Elige tu apodo" style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 10; -fx-background-radius: 10;" />
+                              <TextField fx:id="txtRegUser" prefHeight="35.0" promptText="Elige tu apodo" style="-fx-background-radius: 25;" />
+                              <Label />
                            </children>
                         </VBox>
                         <VBox spacing="6.0">
@@ -148,7 +149,8 @@
                                     <Font name="System Bold" size="10.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="txtRegEmail" prefHeight="45.0" promptText="ejemplo@correo.com" style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 10; -fx-background-radius: 10;" />
+                              <TextField fx:id="txtRegEmail" prefHeight="35.0" promptText="ejemplo@correo.com" style="-fx-background-radius: 25;" />
+                              <Label />
                            </children>
                         </VBox>
                         <VBox spacing="6.0">
@@ -158,7 +160,8 @@
                                     <Font name="System Bold" size="10.0" />
                                  </font>
                               </Label>
-                              <PasswordField fx:id="txtRegPass" prefHeight="45.0" promptText="••••••••" style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 10; -fx-background-radius: 10;" />
+                              <PasswordField fx:id="txtRegPass" prefHeight="35.0" promptText="Escriba su contraseña" style="-fx-background-radius: 25;" />
+                              <Label />
                            </children>
                         </VBox>
                         <VBox spacing="6.0">
@@ -168,14 +171,15 @@
                                     <Font name="System Bold" size="10.0" />
                                  </font>
                               </Label>
-                              <DatePicker fx:id="txtRegDate" maxWidth="1.7976931348623157E308" prefHeight="45.0" style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 10;" />
+                              <DatePicker fx:id="txtRegDate" maxWidth="1.7976931348623157E308" prefHeight="35.0" style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 10;" />
+                              <Label />
                            </children>
                         </VBox>
                      </children>
                   </VBox>
                   <VBox spacing="15.0">
                      <children>
-                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="55.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 30; -fx-cursor: hand;" text="CREAR CUENTA">
+                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="40.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 30; -fx-cursor: hand;" text="Registrarse">
                            <font>
                               <Font size="16.0" />
                            </font>
