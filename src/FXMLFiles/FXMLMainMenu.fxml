@@ -29,12 +29,12 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="720.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mapademo.FXMLDocumentController">
+<BorderPane prefHeight="720.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mapademo.MainMenuController">
 
    <center>
       <StackPane fx:id="centerContainer" style="-fx-background-color: #f1f5f9;">
 
-         <SplitPane fx:id="splitPane" disable="true" dividerPositions="0.25" visible="false">
+         <SplitPane fx:id="menuMapa" disable="true" dividerPositions="0.25" visible="false">
             <items>
                <StackPane fx:id="leftPanelContainer" minWidth="250.0">
                   <children>
@@ -102,7 +102,7 @@
                </ScrollPane>
             </items>
          </SplitPane>
-         <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" visible="false">
+         <VBox fx:id="menuAñadirMapa" alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
             <children>
                <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="1024.0" style="-fx-background-color: white; -fx-border-color: #e2e8f0;">
                   <padding>
@@ -128,7 +128,7 @@
                            <Label text="¡Añade un mapa para poder registrar todas tus hazañas!" textFill="#64748b" />
                         </children>
                         <VBox.margin>
-                           <Insets top="10.0" />
+                           <Insets bottom="10.0" top="10.0" />
                         </VBox.margin>
                      </VBox>
                      <VBox alignment="CENTER" prefHeight="151.0" prefWidth="1024.0" spacing="10.0">
@@ -141,7 +141,7 @@
                            <StackPane prefHeight="150.0" prefWidth="200.0">
                               <children>
                                  <Circle fill="#2196f3" radius="51.0" stroke="BLACK" strokeType="INSIDE" />
-                                 <Button mnemonicParsing="false" prefHeight="74.0" prefWidth="88.0" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-background-color: #2196F3; -fx-background-radius: 30;" text="⏏">
+                                 <Button fx:id="btnSelectMapa" mnemonicParsing="false" onAction="#mapaSeleccionado" prefHeight="74.0" prefWidth="88.0" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-background-color: #2196F3; -fx-background-radius: 30;" text="⏏">
                                     <font>
                                        <Font size="36.0" />
                                     </font>
@@ -239,12 +239,12 @@
             </children>
          </VBox>
 
-         <VBox fx:id="vistaPerfil" alignment="TOP_CENTER" style="-fx-background-color: #f1f5f9;">
+         <VBox fx:id="menuModPerfil" alignment="TOP_CENTER" style="-fx-background-color: #f1f5f9;" visible="false">
             <children>
                <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="1024.0" style="-fx-background-color: white; -fx-border-color: #e2e8f0;">
                   <padding><Insets left="20.0" right="20.0" /></padding>
                   <children>
-                     <Button fx:id="btnVolverDesdePerfil" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: #2196F3; -fx-font-weight: bold; -fx-cursor: hand;" text="⬅ Volver al Mapa">
+                     <Button fx:id="btnVolverDesdePerfil" mnemonicParsing="false" onAction="#volverDesdePerfilAlMapa" style="-fx-background-color: transparent; -fx-text-fill: #2196F3; -fx-font-weight: bold; -fx-cursor: hand;" text="⬅ Volver al Mapa">
                         <font><Font size="14.0" /></font>
                      </Button>
                   </children>
@@ -267,15 +267,15 @@
 
                            <VBox alignment="CENTER" spacing="12.0">
                               <children>
-                                 <StackPane maxWidth="-Infinity">
+                                 <StackPane maxWidth="-Infinity" prefHeight="70.0" prefWidth="90.0">
                                     <children>
-                                       <Circle fill="#f8fafc" radius="55.0" stroke="#e2e8f0" strokeType="INSIDE" />
+                                       <Circle fill="#f8fafc" radius="63.0" stroke="#e2e8f0" strokeType="INSIDE" />
                                        <ImageView fitHeight="90.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true">
                                           <image><Image url="@../resources/logo.png" /></image>
                                        </ImageView>
                                     </children>
                                  </StackPane>
-                                 <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: #2196F3; -fx-font-weight: bold; -fx-cursor: hand;" text="CAMBIAR AVATAR" />
+                                 <Button fx:id="btnCamAvaModPer" mnemonicParsing="false" onAction="#cambioAvatar" style="-fx-background-color: transparent; -fx-text-fill: #2196F3; -fx-font-weight: bold; -fx-cursor: hand;" text="CAMBIAR AVATAR" />
                               </children>
                            </VBox>
 
@@ -304,8 +304,8 @@
 
                            <HBox prefHeight="111.0" prefWidth="420.0" spacing="15.0">
                               <children>
-                                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="50.0" style="-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-background-radius: 25; -fx-cursor: hand;" text="DESCARTAR" HBox.hgrow="ALWAYS" />
-                                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="50.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-cursor: hand;" text="GUARDAR" HBox.hgrow="ALWAYS" />
+                                 <Button fx:id="btnDescartarModPer" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#descartarModPerfil" prefHeight="50.0" style="-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-background-radius: 25; -fx-cursor: hand;" text="DESCARTAR" HBox.hgrow="ALWAYS" />
+                                 <Button fx:id="btnGuardarModPer" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#guardarModPerfil" prefHeight="50.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-cursor: hand;" text="GUARDAR" HBox.hgrow="ALWAYS" />
                               </children>
                               <VBox.margin><Insets top="10.0" /></VBox.margin>
                            </HBox>
@@ -316,14 +316,14 @@
             </children>
          </VBox>
 
-         <VBox fx:id="vistaHistorial" alignment="TOP_CENTER" style="-fx-background-color: #f1f5f9;" visible="false">
+         <VBox fx:id="menuHistorial" alignment="TOP_CENTER" style="-fx-background-color: #f1f5f9;" visible="false">
             <children>
                <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="1024.0" style="-fx-background-color: white; -fx-border-color: #e2e8f0;">
                   <padding>
                      <Insets left="20.0" right="20.0" />
                   </padding>
                   <children>
-                     <Button fx:id="btnVolverDesdePerfil1" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: #2196F3; -fx-font-weight: bold; -fx-cursor: hand;" text="⬅ Volver al Mapa">
+                     <Button fx:id="btnVolverDesdeHistorial" mnemonicParsing="false" onAction="#volverDesdeHistorial" style="-fx-background-color: transparent; -fx-text-fill: #2196F3; -fx-font-weight: bold; -fx-cursor: hand;" text="⬅ Volver al Mapa">
                         <font>
                            <Font size="14.0" />
                         </font>

@@ -235,7 +235,7 @@ public class AuthController {
     @FXML
     private void pasarAlMenu(ActionEvent event) throws IOException {
         SportActivityApp aux = SportActivityApp.getInstance();
-        if(aux.login(txtLogUser.getText(), txtLogPass.getText()) || (txtLogUser.getText().equals("Pepe") && txtLogPass.getText().equals("12345"))){
+        if((txtLogUser.getText().equals("Pepe") && txtLogPass.getText().equals("12345"))){
             labelLogErr.setVisible(false);
             txtLogUser.clear();
             txtLogPass.clear();

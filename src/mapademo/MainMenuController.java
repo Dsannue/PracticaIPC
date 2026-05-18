@@ -35,6 +35,8 @@ import java.util.ResourceBundle;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -68,6 +70,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import mapademo.Poi;
@@ -159,8 +162,6 @@ public class MainMenuController implements Initializable {
     @FXML
     private Label mousePosition;
     @FXML
-    private SplitPane splitPane;
-    @FXML
     private Button btnMapChanger;
     @FXML
     private MenuItem profileMod;
@@ -187,8 +188,6 @@ public class MainMenuController implements Initializable {
     @FXML
     private Button btnGuardar;
     @FXML
-    private VBox vistaPerfil;
-    @FXML
     private Button btnVolverDesdePerfil;
     @FXML
     private TextField txtEmail;
@@ -197,9 +196,25 @@ public class MainMenuController implements Initializable {
     @FXML
     private DatePicker dpFecha;
     @FXML
-    private VBox vistaHistorial;
+    private SplitPane menuMapa;
     @FXML
-    private Button btnVolverDesdePerfil1;
+    private VBox menuAñadirMapa;
+    @FXML
+    private VBox menuModPerfil;
+    @FXML
+    private Button btnCamAvaModPer;
+    @FXML
+    private Button btnDescartarModPer;
+    @FXML
+    private Button btnGuardarModPer;
+    @FXML
+    private VBox menuHistorial;
+    @FXML
+    private Button btnVolverDesdeHistorial;
+    
+    private BooleanProperty cambioMapaModPerfil;
+    private BooleanProperty cambioMapaAñaMapa;
+    private BooleanProperty cambioMapaHistorial;
  
 
     // =========================================================
@@ -447,7 +462,7 @@ public class MainMenuController implements Initializable {
      * @param url  URL del documento FXML (no usado aquí)
      * @param rb   paquete de recursos de internacionalización (no usado aquí)
      */
-    @Override
+    @FXML
     public void initialize(URL url, ResourceBundle rb) {
 
         // ── Configuración del slider de zoom ──────────────────────────
@@ -490,6 +505,28 @@ public class MainMenuController implements Initializable {
         // ── Carga del mapa inicial ─────────────────────────────────────
         // El fichero se busca relativo al directorio de trabajo del proyecto.
         buildMap(new File("maps/upv.jpg"));
+        
+        //Creo objetos para gestionar las interfaces
+        cambioMapaAñaMapa = new SimpleBooleanProperty(Boolean.FALSE);
+        cambioMapaModPerfil = new SimpleBooleanProperty(Boolean.FALSE);
+        cambioMapaHistorial = new SimpleBooleanProperty(Boolean.FALSE);
+        
+        //Setting de las propiedades en funcion de los booleans
+        menuMapa.visibleProperty().bind(cambioMapaAñaMapa);
+        menuMapa.visibleProperty().bind(cambioMapaModPerfil.not());
+        menuMapa.visibleProperty().bind(cambioMapaHistorial.not());
+        menuMapa.disableProperty().bind(cambioMapaAñaMapa.not());
+        menuMapa.disableProperty().bind(cambioMapaModPerfil);
+        menuMapa.disableProperty().bind(cambioMapaHistorial);
+        
+        menuAñadirMapa.visibleProperty().bind(cambioMapaAñaMapa);
+        menuAñadirMapa.disableProperty().bind(cambioMapaAñaMapa.not());
+        
+        menuModPerfil.visibleProperty().bind(cambioMapaModPerfil);
+        menuModPerfil.disableProperty().bind(cambioMapaModPerfil.not());
+        
+        menuHistorial.visibleProperty().bind(cambioMapaHistorial);
+        menuHistorial.disableProperty().bind(cambioMapaHistorial.not());
     }
 
     // =========================================================
@@ -616,8 +653,8 @@ public class MainMenuController implements Initializable {
     // =========================================================
 
     /**
-     * Abre un selector de fichero para que el usuario elija una imagen
-     * diferente como mapa y reconstruye toda la vista.
+     * Abre la interfaz donde tendra para seleccionar un fichero para que el usuario elija una imagen
+     * diferente como mapa y con sus coordenadas.
      *
      * FIX 3: se comprueba que imgFile no sea null antes de usarlo,
      * evitando NullPointerException cuando el usuario cierra el FileChooser
@@ -628,13 +665,15 @@ public class MainMenuController implements Initializable {
      */
     @FXML
     private void cambiarMapa(ActionEvent event) throws IOException {
+        cambioMapaAñaMapa.set(true);
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File(".")); // Empezamos en el directorio del proyecto
-
+        fc.getExtensionFilters().addAll(new ExtensionFilter("Imagenes", "*.png"));
         File imgFile = fc.showOpenDialog(zoom_slider.getScene().getWindow());
 
         // FIX 3: showOpenDialog() devuelve null si el usuario cancela la selección
         if (imgFile != null) {
+            //Actualizar label del path
             System.out.println("Mapa seleccionado: " + imgFile.getCanonicalPath());
             buildMap(imgFile); // Reconstruimos la vista con la nueva imagen
             map_listview.getItems().clear(); // Borramos los datos del mapa anterior
@@ -670,6 +709,26 @@ public class MainMenuController implements Initializable {
 
     @FXML
     private void handleGuardar(ActionEvent event) {
+    }
+
+    @FXML
+    private void volverDesdePerfilAlMapa(ActionEvent event) {
+    }
+
+    @FXML
+    private void cambioAvatar(ActionEvent event) {
+    }
+
+    @FXML
+    private void descartarModPerfil(ActionEvent event) {
+    }
+
+    @FXML
+    private void guardarModPerfil(ActionEvent event) {
+    }
+
+    @FXML
+    private void volverDesdeHistorial(ActionEvent event) {
     }
 
 
