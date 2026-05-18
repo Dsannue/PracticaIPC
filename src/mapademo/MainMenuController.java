@@ -45,12 +45,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.SplitPane;
@@ -79,7 +81,7 @@ import mapademo.Poi;
  * Implementa {@link Initializable} para poder ejecutar código de
  * inicialización una vez que el FXML ha sido cargado completamente.
  */
-public class FXMLDocumentController implements Initializable {
+public class MainMenuController implements Initializable {
 
     // =========================================================
     //  ESTRUCTURA DE NODOS PARA ZOOM
@@ -176,6 +178,28 @@ public class FXMLDocumentController implements Initializable {
     private Button btnAddActivity;
     @FXML
     private Button btnActAcumulation;
+    @FXML
+    private StackPane centerContainer;
+    @FXML
+    private Button btnVolverDesdePerfil3;
+    @FXML
+    private Button btnCancelar;
+    @FXML
+    private Button btnGuardar;
+    @FXML
+    private VBox vistaPerfil;
+    @FXML
+    private Button btnVolverDesdePerfil;
+    @FXML
+    private TextField txtEmail;
+    @FXML
+    private PasswordField txtPassword;
+    @FXML
+    private DatePicker dpFecha;
+    @FXML
+    private VBox vistaHistorial;
+    @FXML
+    private Button btnVolverDesdePerfil1;
  
 
     // =========================================================
@@ -638,6 +662,14 @@ public class FXMLDocumentController implements Initializable {
         circle.setCenterX(x);
         circle.setCenterY(y);
         mapPane.getChildren().add(circle); // Se añade sobre el mapa como cualquier nodo
+    }
+
+    @FXML
+    private void handleCancelar(ActionEvent event) {
+    }
+
+    @FXML
+    private void handleGuardar(ActionEvent event) {
     }
 
 

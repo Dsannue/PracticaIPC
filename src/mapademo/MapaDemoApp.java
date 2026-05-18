@@ -18,14 +18,20 @@ import javafx.stage.Stage;
  */
 public class MapaDemoApp extends Application {
     
+    private static Scene scene;
+    
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/FXMLFiles/FXMLAuthentificator.fxml"));
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/resources/logo.png")));
-        Scene scene = new Scene(root);
+        scene = new Scene(root);
         stage.setTitle("Running La Safor");
         stage.setScene(scene);
         stage.show();
+    }
+    
+    public static void setRoot(Parent root){
+        scene.setRoot(root);
     }
 
     /**

@@ -52,7 +52,7 @@
       </StackPane>
       <StackPane prefHeight="720.0" prefWidth="640.0" style="-fx-background-color: white;" HBox.hgrow="ALWAYS">
          <children>
-            <VBox fx:id="AuthBox" alignment="CENTER" prefHeight="720.0" prefWidth="613.0" spacing="20.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" visible="false">
+            <VBox fx:id="AuthBox" alignment="CENTER" prefHeight="720.0" prefWidth="613.0" spacing="20.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
                <padding>
                   <Insets bottom="40.0" left="30.0" right="30.0" top="40.0" />
                </padding>
@@ -81,7 +81,7 @@
                                     <Font name="System Bold" size="13.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="usernameField" prefHeight="35.0" prefWidth="597.0" promptText="Introduce tu usuario" style="-fx-background-radius: 25;" styleClass="campo" />
+                              <TextField fx:id="txtLogUser" prefHeight="35.0" prefWidth="597.0" promptText="Introduce tu usuario" style="-fx-background-radius: 25; -fx-border-radius: 10;" styleClass="campo" />
                            </children>
                         </VBox>
                         <VBox spacing="5.0">
@@ -91,7 +91,7 @@
                                     <Font name="System Bold" size="13.0" />
                                  </font>
                               </Label>
-                              <PasswordField fx:id="passwordField" prefHeight="35.0" prefWidth="668.0" promptText="Introduce tu contraseña" style="-fx-background-radius: 25;" styleClass="campo" />
+                              <PasswordField fx:id="txtLogPass" prefHeight="35.0" prefWidth="668.0" promptText="Introduce tu contraseña" style="-fx-background-radius: 25; -fx-border-radius: 10;" styleClass="campo" />
                            </children>
                            <VBox.margin>
                               <Insets top="10.0" />
@@ -101,20 +101,25 @@
                   </VBox>
                   <Label />
                   <Separator prefWidth="200.0" />
-                  <VBox spacing="10.0">
+                  <VBox alignment="CENTER" spacing="10.0">
                      <children>
-                        <Button fx:id="btnLogin" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleLogin" prefHeight="40.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25;" text="Autentificar" />
+                        <Label fx:id="labelLogErr" text="Usuario o Contraseña incorrectos" textFill="RED" visible="false">
+                           <font>
+                              <Font name="System Italic" size="12.0" />
+                           </font>
+                        </Label>
+                        <Button fx:id="btnAut" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#pasarAlMenu" prefHeight="40.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25;" text="Autentificar" />
                         <HBox alignment="CENTER" spacing="5.0">
                            <children>
                               <Label text="¿Nuevo en el club?" textFill="#64748b" />
-                              <Button mnemonicParsing="false" onAction="#mostrarReg" style="-fx-background-color: transparent; -fx-text-fill: #2196F3; -fx-font-weight: bold;" text="Registrate gratis" />
+                              <Button fx:id="btnChangeReg" mnemonicParsing="false" onAction="#mostrarReg" style="-fx-background-color: transparent; -fx-text-fill: #2196F3; -fx-font-weight: bold;" text="Registrate gratis" />
                            </children>
                         </HBox>
                      </children>
                   </VBox>
                </children>
             </VBox>
-            <VBox fx:id="RegBox" alignment="CENTER" prefHeight="720.0" prefWidth="585.0" spacing="25.0">
+            <VBox fx:id="RegBox" alignment="CENTER" prefHeight="720.0" prefWidth="585.0" spacing="25.0" visible="false">
                <padding>
                   <Insets left="100.0" right="100.0" />
                </padding>
@@ -138,8 +143,11 @@
                                     <Font name="System Bold" size="10.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="txtRegUser" prefHeight="35.0" promptText="Elige tu apodo" style="-fx-background-radius: 25;" />
-                              <Label fx:id="labelErrName" />
+                              <TextField fx:id="txtRegUser" prefHeight="35.0" promptText="Elige tu apodo" style="-fx-background-radius: 25; -fx-border-radius: 10;" />
+                              <Label fx:id="labelErrUser" textFill="RED">
+                                 <font>
+                                    <Font name="System Italic" size="12.0" />
+                                 </font></Label>
                            </children>
                         </VBox>
                         <VBox spacing="6.0">
@@ -149,8 +157,11 @@
                                     <Font name="System Bold" size="10.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="txtRegEmail" prefHeight="35.0" promptText="ejemplo@correo.com" style="-fx-background-radius: 25;" />
-                              <Label fx:id="labelErrEmail" />
+                              <TextField fx:id="txtRegEmail" prefHeight="35.0" promptText="ejemplo@correo.com" style="-fx-background-radius: 25; -fx-border-radius: 10;" />
+                              <Label fx:id="labelErrEmail" textFill="RED">
+                                 <font>
+                                    <Font name="System Italic" size="12.0" />
+                                 </font></Label>
                            </children>
                         </VBox>
                         <VBox spacing="6.0">
@@ -160,8 +171,11 @@
                                     <Font name="System Bold" size="10.0" />
                                  </font>
                               </Label>
-                              <PasswordField fx:id="txtRegPass" prefHeight="35.0" promptText="Escriba su contraseña" style="-fx-background-radius: 25;" />
-                              <Label fx:id="labelErrPass" />
+                              <PasswordField fx:id="txtRegPass" prefHeight="35.0" promptText="Escriba su contraseña" style="-fx-background-radius: 25; -fx-border-radius: 10;" />
+                              <Label fx:id="labelErrPass" textFill="RED">
+                                 <font>
+                                    <Font name="System Italic" size="12.0" />
+                                 </font></Label>
                            </children>
                         </VBox>
                         <VBox spacing="6.0">
@@ -172,7 +186,10 @@
                                  </font>
                               </Label>
                               <DatePicker fx:id="txtRegDate" maxWidth="1.7976931348623157E308" prefHeight="35.0" style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 10;" />
-                              <Label fx:id="labelErrAge" />
+                              <Label fx:id="labelErrDate" textFill="RED">
+                                 <font>
+                                    <Font name="System Italic" size="12.0" />
+                                 </font></Label>
                            </children>
                         </VBox>
                      </children>
@@ -187,7 +204,7 @@
                         <HBox alignment="CENTER" spacing="5.0">
                            <children>
                               <Label text="¿Ya tienes cuenta?" textFill="#64748b" />
-                              <Button fx:id="btnLogin" mnemonicParsing="false" onAction="#mostrarLogin" style="-fx-background-color: transparent; -fx-text-fill: #2196F3; -fx-font-weight: bold; -fx-cursor: hand;" text="Inicia sesión aquí" />
+                              <Button fx:id="btnChangeLogin" mnemonicParsing="false" onAction="#mostrarLogin" style="-fx-background-color: transparent; -fx-text-fill: #2196F3; -fx-font-weight: bold; -fx-cursor: hand;" text="Inicia sesión aquí" />
                            </children>
                         </HBox>
                      </children>
