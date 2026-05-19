@@ -37,7 +37,9 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -165,8 +167,6 @@ public class MainMenuController implements Initializable {
     @FXML
     private Button btnMapChanger;
     @FXML
-    private MenuItem profileMod;
-    @FXML
     private StackPane leftPanelContainer;
     @FXML
     private VBox detailView;
@@ -211,9 +211,7 @@ public class MainMenuController implements Initializable {
     @FXML
     private Button btnVolverDesdeHistorial;
     
-    private BooleanProperty cambioMapaModPerfil;
-    private BooleanProperty cambioMapaAñaMapa;
-    private BooleanProperty cambioMapaHistorial;
+    private IntegerProperty cambioPestaña;
     @FXML
     private Button btnSelectMapa;
     @FXML
@@ -236,6 +234,12 @@ public class MainMenuController implements Initializable {
     private File map;
     @FXML
     private Button btnVolverDesdeAñadirMapa;
+    @FXML
+    private MenuItem btnLogOut;
+    @FXML
+    private MenuItem btnprofileMod;
+    @FXML
+    private MenuItem btnHistorialSesion;
     
  
 
@@ -529,30 +533,13 @@ public class MainMenuController implements Initializable {
         buildMap(new File("maps/upv.jpg"));
         
         //Creo objetos para gestionar las interfaces
-        /*cambioMapaAñaMapa = new SimpleBooleanProperty(Boolean.FALSE);
-        cambioMapaModPerfil = new SimpleBooleanProperty(Boolean.FALSE);
-        cambioMapaHistorial = new SimpleBooleanProperty(Boolean.FALSE);
+        cambioPestaña = new SimpleIntegerProperty(0);
         
-        //Setting de las propiedades en funcion de los booleans
-        menuMapa.visibleProperty().bind(cambioMapaAñaMapa);
-        menuMapa.visibleProperty().bind(cambioMapaModPerfil.not());
-        menuMapa.visibleProperty().bind(cambioMapaHistorial.not());
-        menuMapa.disableProperty().bind(cambioMapaAñaMapa.not());
-        menuMapa.disableProperty().bind(cambioMapaModPerfil);
-        menuMapa.disableProperty().bind(cambioMapaHistorial);
+        menuMapa.visibleProperty().bind(Bindings.equal(0, cambioPestaña));
+        menuAñadirMapa.visibleProperty().bind(Bindings.equal(1, cambioPestaña));
+        menuModPerfil.visibleProperty().bind(Bindings.equal(2, cambioPestaña));
+        menuHistorial.visibleProperty().bind(Bindings.equal(3, cambioPestaña));
         
-        menuAñadirMapa.visibleProperty().bind(cambioMapaAñaMapa);
-        menuAñadirMapa.disableProperty().bind(cambioMapaAñaMapa.not());
-        
-        menuModPerfil.visibleProperty().bind(cambioMapaModPerfil);
-        menuModPerfil.disableProperty().bind(cambioMapaModPerfil.not());
-        
-        menuHistorial.visibleProperty().bind(cambioMapaHistorial);
-        menuHistorial.disableProperty().bind(cambioMapaHistorial.not());*/
-        menuMapa.setVisible(true);
-        menuMapa.setDisable(false);
-        menuAñadirMapa.setVisible(false);
-        menuAñadirMapa.setDisable(true);
         
         //Comprobantes para activar el boton de guardar para añadir el mapa
         coord1 = new SimpleBooleanProperty(Boolean.FALSE);
@@ -705,10 +692,8 @@ public class MainMenuController implements Initializable {
      */
     @FXML
     private void cambiarMapa(ActionEvent event) throws IOException {
-        menuMapa.setVisible(false);
-        menuMapa.setDisable(true);
-        menuAñadirMapa.setVisible(true);
-        menuAñadirMapa.setDisable(false);
+        cambioPestaña.set(1);
+        btnMapChanger.setDisable(true);
     }
 
     // =========================================================
@@ -742,6 +727,10 @@ public class MainMenuController implements Initializable {
 
     @FXML
     private void cambioAvatar(ActionEvent event) {
+        FileChooser fc = new FileChooser();
+        fc.setInitialDirectory(new File(".")); // Empezamos en el directorio del proyecto
+        fc.getExtensionFilters().addAll(new ExtensionFilter("Imagenes", "*.png"));
+        File imgFile = fc.showOpenDialog(zoom_slider.getScene().getWindow());
     }
 
     @FXML
@@ -797,6 +786,8 @@ public class MainMenuController implements Initializable {
     private void guardarMapa(ActionEvent event) {
         buildMap(map);
         map_listview.getItems().clear();
+        btnMapChanger.setDisable(false);
+        
         
     }
 
@@ -806,6 +797,21 @@ public class MainMenuController implements Initializable {
         menuMapa.setDisable(false);
         menuAñadirMapa.setVisible(false);
         menuAñadirMapa.setDisable(true);
+        btnMapChanger.setDisable(false);
+    }
+
+    @FXML
+    private void logout(ActionEvent event) {
+    }
+
+    @FXML
+    private void cambiaMenuModPerfil(ActionEvent event) {
+        cambioPestaña.set(2);
+    }
+
+    @FXML
+    private void cambiaHistorialSesion(ActionEvent event) {
+        cambioPestaña.set(3);
     }
 
 
