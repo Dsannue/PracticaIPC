@@ -35,6 +35,7 @@ import java.util.ResourceBundle;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
@@ -182,8 +183,6 @@ public class MainMenuController implements Initializable {
     @FXML
     private StackPane centerContainer;
     @FXML
-    private Button btnVolverDesdePerfil3;
-    @FXML
     private Button btnCancelar;
     @FXML
     private Button btnGuardar;
@@ -215,6 +214,29 @@ public class MainMenuController implements Initializable {
     private BooleanProperty cambioMapaModPerfil;
     private BooleanProperty cambioMapaAñaMapa;
     private BooleanProperty cambioMapaHistorial;
+    @FXML
+    private Button btnSelectMapa;
+    @FXML
+    private Label labelPathMap;
+    
+    private BooleanProperty coord1;
+    private BooleanProperty coord2;
+    private BooleanProperty coord3;
+    private BooleanProperty coord4;
+    private BooleanProperty mapaSelected;
+    @FXML
+    private TextField txtCoord1;
+    @FXML
+    private TextField txtCoord2;
+    @FXML
+    private TextField txtCoord3;
+    @FXML
+    private TextField txtCoord4;
+    
+    private File map;
+    @FXML
+    private Button btnVolverDesdeAñadirMapa;
+    
  
 
     // =========================================================
@@ -507,7 +529,7 @@ public class MainMenuController implements Initializable {
         buildMap(new File("maps/upv.jpg"));
         
         //Creo objetos para gestionar las interfaces
-        cambioMapaAñaMapa = new SimpleBooleanProperty(Boolean.FALSE);
+        /*cambioMapaAñaMapa = new SimpleBooleanProperty(Boolean.FALSE);
         cambioMapaModPerfil = new SimpleBooleanProperty(Boolean.FALSE);
         cambioMapaHistorial = new SimpleBooleanProperty(Boolean.FALSE);
         
@@ -526,7 +548,25 @@ public class MainMenuController implements Initializable {
         menuModPerfil.disableProperty().bind(cambioMapaModPerfil.not());
         
         menuHistorial.visibleProperty().bind(cambioMapaHistorial);
-        menuHistorial.disableProperty().bind(cambioMapaHistorial.not());
+        menuHistorial.disableProperty().bind(cambioMapaHistorial.not());*/
+        menuMapa.setVisible(true);
+        menuMapa.setDisable(false);
+        menuAñadirMapa.setVisible(false);
+        menuAñadirMapa.setDisable(true);
+        
+        //Comprobantes para activar el boton de guardar para añadir el mapa
+        coord1 = new SimpleBooleanProperty(Boolean.FALSE);
+        coord2 = new SimpleBooleanProperty(Boolean.FALSE);
+        coord3 = new SimpleBooleanProperty(Boolean.FALSE);
+        coord4 = new SimpleBooleanProperty(Boolean.FALSE);
+        mapaSelected = new SimpleBooleanProperty(Boolean.FALSE);
+        
+        btnGuardar.disableProperty().bind(Bindings.or(coord1.not(), coord2.not()).or(coord3.not()).or(coord4.not()).or(mapaSelected.not()));
+        txtCoord1.disableProperty().bind(mapaSelected.not());
+        txtCoord2.disableProperty().bind(mapaSelected.not());
+        txtCoord3.disableProperty().bind(mapaSelected.not());
+        txtCoord4.disableProperty().bind(mapaSelected.not());
+        
     }
 
     // =========================================================
@@ -665,19 +705,10 @@ public class MainMenuController implements Initializable {
      */
     @FXML
     private void cambiarMapa(ActionEvent event) throws IOException {
-        cambioMapaAñaMapa.set(true);
-        FileChooser fc = new FileChooser();
-        fc.setInitialDirectory(new File(".")); // Empezamos en el directorio del proyecto
-        fc.getExtensionFilters().addAll(new ExtensionFilter("Imagenes", "*.png"));
-        File imgFile = fc.showOpenDialog(zoom_slider.getScene().getWindow());
-
-        // FIX 3: showOpenDialog() devuelve null si el usuario cancela la selección
-        if (imgFile != null) {
-            //Actualizar label del path
-            System.out.println("Mapa seleccionado: " + imgFile.getCanonicalPath());
-            buildMap(imgFile); // Reconstruimos la vista con la nueva imagen
-            map_listview.getItems().clear(); // Borramos los datos del mapa anterior
-        }
+        menuMapa.setVisible(false);
+        menuMapa.setDisable(true);
+        menuAñadirMapa.setVisible(true);
+        menuAñadirMapa.setDisable(false);
     }
 
     // =========================================================
@@ -703,13 +734,7 @@ public class MainMenuController implements Initializable {
         mapPane.getChildren().add(circle); // Se añade sobre el mapa como cualquier nodo
     }
 
-    @FXML
-    private void handleCancelar(ActionEvent event) {
-    }
 
-    @FXML
-    private void handleGuardar(ActionEvent event) {
-    }
 
     @FXML
     private void volverDesdePerfilAlMapa(ActionEvent event) {
@@ -729,6 +754,58 @@ public class MainMenuController implements Initializable {
 
     @FXML
     private void volverDesdeHistorial(ActionEvent event) {
+    }
+
+    @FXML
+    private void mapaSeleccionado(ActionEvent event) throws IOException {
+        FileChooser fc = new FileChooser();
+        fc.setInitialDirectory(new File(".")); // Empezamos en el directorio del proyecto
+        fc.getExtensionFilters().addAll(new ExtensionFilter("Imagenes", "*.png"));
+        File imgFile = fc.showOpenDialog(zoom_slider.getScene().getWindow());
+
+        // FIX 3: showOpenDialog() devuelve null si el usuario cancela la selección
+        if (imgFile != null) {
+            //Actualizar label del path
+            labelPathMap.setVisible(true);
+            labelPathMap.setText(imgFile.getAbsolutePath());
+            map = imgFile;// Reconstruimos la vista con la nueva imagen
+            mapaSelected.set(true);
+        }else{
+            labelPathMap.setVisible(false);
+            map = null;
+            mapaSelected.set(false);
+        }
+    }
+
+    @FXML
+    private void descartarAñadirMapa(ActionEvent event) {
+        map = null;
+        txtCoord1.clear();
+        txtCoord2.clear();
+        txtCoord3.clear();
+        txtCoord4.clear();
+        
+        labelPathMap.setVisible(false);
+        mapaSelected.set(false);
+        coord1.set(false);
+        coord2.set(false);
+        coord3.set(false);
+        coord4.set(false);
+    }
+
+    @FXML
+    private void guardarMapa(ActionEvent event) {
+        buildMap(map);
+        map_listview.getItems().clear();
+        
+    }
+
+    @FXML
+    private void volverDesdeAñadirMapa(ActionEvent event) {
+        menuMapa.setVisible(true);
+        menuMapa.setDisable(false);
+        menuAñadirMapa.setVisible(false);
+        menuAñadirMapa.setDisable(true);
     }
 
 

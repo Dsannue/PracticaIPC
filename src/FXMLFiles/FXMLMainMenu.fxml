@@ -93,7 +93,7 @@
                         <children>
                            <ImageView pickOnBounds="true">
                               <image>
-                                 <Image url="@PracticaIPC/src/resources/calderona.jpg" />
+                                 <Image url="@../resources/upv.jpg" />
                               </image>
                            </ImageView>
                         </children>
@@ -109,7 +109,7 @@
                      <Insets left="20.0" right="20.0" />
                   </padding>
                   <children>
-                     <Button fx:id="btnVolverDesdePerfil3" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: #2196F3; -fx-font-weight: bold; -fx-cursor: hand;" text="⬅ Volver al Mapa">
+                     <Button fx:id="btnVolverDesdeAñadirMapa" mnemonicParsing="false" onAction="#volverDesdeAñadirMapa" style="-fx-background-color: transparent; -fx-text-fill: #2196F3; -fx-font-weight: bold; -fx-cursor: hand;" text="⬅ Volver al Mapa">
                         <font>
                            <Font size="14.0" />
                         </font>
@@ -150,8 +150,10 @@
                            </StackPane>
                            <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0">
                               <children>
-                                 <Label textFill="#64748b" visible="false" />
-                                 <Label text="Error: No es un PNG" textFill="#ca0505" visible="false" />
+                                 <Label fx:id="labelPathMap" textFill="#0f1012" visible="false">
+                                    <font>
+                                       <Font size="12.0" />
+                                    </font></Label>
                               </children>
                            </VBox>
                         </children>
@@ -183,7 +185,7 @@
                                              <Font name="System Bold" size="13.0" />
                                           </font>
                                        </Label>
-                                       <TextField maxWidth="160.0" prefHeight="45.0" prefWidth="160.0" promptText="Ej: 39.0123" style="-fx-background-radius: 10;" />
+                                       <TextField fx:id="txtCoord1" maxWidth="160.0" prefHeight="45.0" prefWidth="160.0" promptText="Ej: 39.0123" style="-fx-background-radius: 10;" />
                                     </children>
                                     <GridPane.margin>
                                        <Insets right="5.0" />
@@ -196,7 +198,7 @@
                                              <Font name="System Bold" size="13.0" />
                                           </font>
                                        </Label>
-                                       <TextField maxWidth="160.0" prefHeight="45.0" prefWidth="160.0" promptText="Ej: 38.9102" style="-fx-background-radius: 10;" />
+                                       <TextField fx:id="txtCoord2" maxWidth="160.0" prefHeight="45.0" prefWidth="160.0" promptText="Ej: 38.9102" style="-fx-background-radius: 10;" />
                                     </children>
                                  </VBox>
                                  <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.rowIndex="1">
@@ -206,7 +208,7 @@
                                              <Font name="System Bold" size="13.0" />
                                           </font>
                                        </Label>
-                                       <TextField maxWidth="160.0" prefHeight="45.0" promptText="Ej: -0.2154" style="-fx-background-radius: 10;">
+                                       <TextField fx:id="txtCoord3" maxWidth="160.0" prefHeight="45.0" promptText="Ej: -0.2154" style="-fx-background-radius: 10;">
                                           <VBox.margin>
                                              <Insets right="5.0" />
                                           </VBox.margin>
@@ -220,7 +222,7 @@
                                              <Font name="System Bold" size="13.0" />
                                           </font>
                                        </Label>
-                                       <TextField maxWidth="160.0" prefHeight="45.0" promptText="Ej: -0.1020" style="-fx-background-radius: 10;" />
+                                       <TextField fx:id="txtCoord4" maxWidth="160.0" prefHeight="45.0" promptText="Ej: -0.1020" style="-fx-background-radius: 10;" />
                                     </children>
                                  </VBox>
                               </children>
@@ -228,8 +230,8 @@
                            <Label maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="40.0" prefWidth="322.0" text="Nota: Si no introduces los datos correctamente, la representacion del mapa no sera precisa." textAlignment="CENTER" textFill="#64748b" wrapText="true" />
                            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="322.0" spacing="10.0">
                               <children>
-                                 <Button fx:id="btnCancelar" mnemonicParsing="false" onAction="#handleCancelar" prefHeight="59.0" prefWidth="123.0" style="-fx-background-color: transparent; -fx-text-fill: #64748b; -fx-font-weight: bold;" text="DESCARTAR" />
-                                 <Button fx:id="btnGuardar" mnemonicParsing="false" onAction="#handleGuardar" prefHeight="56.0" prefWidth="137.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25;" text="AÑADIR" />
+                                 <Button fx:id="btnCancelar" mnemonicParsing="false" onAction="#descartarAñadirMapa" prefHeight="59.0" prefWidth="123.0" style="-fx-background-color: transparent; -fx-text-fill: #64748b; -fx-font-weight: bold;" text="DESCARTAR" />
+                                 <Button fx:id="btnGuardar" mnemonicParsing="false" onAction="#guardarMapa" prefHeight="56.0" prefWidth="137.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25;" text="AÑADIR" />
                               </children>
                            </HBox>
                         </children>
