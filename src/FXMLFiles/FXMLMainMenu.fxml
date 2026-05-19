@@ -34,7 +34,7 @@
    <center>
       <StackPane fx:id="centerContainer" style="-fx-background-color: #f1f5f9;">
 
-         <SplitPane fx:id="menuMapa" dividerPositions="0.25">
+         <SplitPane fx:id="menuMapa" dividerPositions="0.25" visible="false">
             <items>
                <StackPane fx:id="leftPanelContainer" minWidth="250.0">
                   <children>
@@ -102,7 +102,7 @@
                </ScrollPane>
             </items>
          </SplitPane>
-         <VBox fx:id="menuAñadirMapa" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" visible="false">
+         <VBox prefHeight="200.0" prefWidth="100.0">
             <children>
                <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="1024.0" style="-fx-background-color: white; -fx-border-color: #e2e8f0;">
                   <padding>
@@ -116,138 +116,176 @@
                      </Button>
                   </children>
                </HBox>
-               <VBox alignment="CENTER" VBox.vgrow="ALWAYS">
+               <HBox alignment="CENTER" prefHeight="697.0" prefWidth="1127.0" spacing="50.0" VBox.vgrow="ALWAYS">
                   <children>
-                     <VBox alignment="TOP_CENTER" prefHeight="70.0" prefWidth="1024.0">
+                     <VBox maxWidth="400.0" prefHeight="680.0" prefWidth="400.0" spacing="5.0" style="-fx-background-color: white; -fx-background-radius: 20;" HBox.hgrow="NEVER">
                         <children>
-                           <Label text="Añadir Mapa">
-                              <font>
-                                 <Font name="System Bold" size="26.0" />
-                              </font>
-                           </Label>
-                           <Label text="¡Añade un mapa para poder registrar todas tus hazañas!" textFill="#64748b" />
-                        </children>
-                        <VBox.margin>
-                           <Insets bottom="10.0" top="10.0" />
-                        </VBox.margin>
-                     </VBox>
-                     <VBox alignment="CENTER_LEFT" maxWidth="400.0" prefHeight="92.0" prefWidth="389.0" spacing="5.0">
-                        <children>
-                           <Label text="NOMBRE DE LA REGION">
+                           <Label text="MAPAS DISPONIBLES">
                               <font>
                                  <Font name="System Bold" size="13.0" />
                               </font>
-                           </Label>
-                           <TextField maxWidth="400.0" prefHeight="38.0" prefWidth="400.0" promptText="Ej: Castellon de la Plana" style="-fx-background-radius: 10; -fx-border-radius: 10;" />
-                        </children>
-                     </VBox>
-                     <VBox alignment="CENTER" prefHeight="151.0" prefWidth="1024.0" spacing="10.0">
-                        <children>
-                           <Label text="Selecciona un archivo PNG">
-                              <font>
-                                 <Font name="System Bold" size="18.0" />
-                              </font>
-                           </Label>
-                           <StackPane prefHeight="150.0" prefWidth="200.0">
-                              <children>
-                                 <Circle fill="#2196f3" radius="51.0" stroke="BLACK" strokeType="INSIDE" />
-                                 <Button fx:id="btnSelectMapa" mnemonicParsing="false" onAction="#mapaSeleccionado" prefHeight="74.0" prefWidth="88.0" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-background-color: #2196F3; -fx-background-radius: 30; -fx-cursor: hand;" text="⏏">
-                                    <font>
-                                       <Font size="36.0" />
-                                    </font>
-                                 </Button>
-                              </children>
-                           </StackPane>
-                           <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0">
-                              <children>
-                                 <Label fx:id="labelPathMap" textFill="#0f1012" visible="false">
-                                    <font>
-                                       <Font size="12.0" />
-                                    </font></Label>
-                              </children>
-                           </VBox>
-                        </children>
-                        <VBox.margin>
-                           <Insets />
-                        </VBox.margin>
-                     </VBox>
-                     <VBox alignment="TOP_CENTER" prefHeight="396.0" prefWidth="1024.0" spacing="15.0">
-                        <children>
-                           <Label text="Ingrese las coordenadas geograficas del mapa." textFill="#64748b">
                               <VBox.margin>
-                                 <Insets top="10.0" />
+                                 <Insets left="10.0" top="10.0" />
                               </VBox.margin>
                            </Label>
-                           <GridPane hgap="15.0" maxWidth="350.0" prefHeight="186.0" prefWidth="364.0" vgap="15.0">
-                              <columnConstraints>
-                                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                              </columnConstraints>
-                              <rowConstraints>
-                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              </rowConstraints>
+                           <ListView prefHeight="551.0" prefWidth="400.0" style="-fx-background-insets: 0; -fx-padding: 0;" VBox.vgrow="ALWAYS">
+                              <VBox.margin>
+                                 <Insets left="10.0" right="10.0" />
+                              </VBox.margin>
+                           </ListView>
+                           <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                               <children>
-                                 <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0">
-                                    <children>
-                                       <Label text="LAT. MÁXIMA (NORTE)">
-                                          <font>
-                                             <Font name="System Bold" size="13.0" />
-                                          </font>
-                                       </Label>
-                                       <TextField fx:id="txtCoord1" maxWidth="160.0" prefHeight="45.0" prefWidth="160.0" promptText="Ej: 39.0123" style="-fx-background-radius: 10;" />
-                                    </children>
-                                    <GridPane.margin>
-                                       <Insets right="5.0" />
-                                    </GridPane.margin>
-                                 </VBox>
-                                 <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="1">
-                                    <children>
-                                       <Label text="LAT. MÍNIMA (SUR)">
-                                          <font>
-                                             <Font name="System Bold" size="13.0" />
-                                          </font>
-                                       </Label>
-                                       <TextField fx:id="txtCoord2" maxWidth="160.0" prefHeight="45.0" prefWidth="160.0" promptText="Ej: 38.9102" style="-fx-background-radius: 10;" />
-                                    </children>
-                                 </VBox>
-                                 <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.rowIndex="1">
-                                    <children>
-                                       <Label text="LONG. MAXIMA (ESTE)">
-                                          <font>
-                                             <Font name="System Bold" size="13.0" />
-                                          </font>
-                                       </Label>
-                                       <TextField fx:id="txtCoord3" maxWidth="160.0" prefHeight="45.0" promptText="Ej: -0.2154" style="-fx-background-radius: 10;">
-                                          <VBox.margin>
-                                             <Insets right="5.0" />
-                                          </VBox.margin>
-                                       </TextField>
-                                    </children>
-                                 </VBox>
-                                 <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                    <children>
-                                       <Label text="LONG. MINIMA (OESTE)">
-                                          <font>
-                                             <Font name="System Bold" size="13.0" />
-                                          </font>
-                                       </Label>
-                                       <TextField fx:id="txtCoord4" maxWidth="160.0" prefHeight="45.0" promptText="Ej: -0.1020" style="-fx-background-radius: 10;" />
-                                    </children>
-                                 </VBox>
-                              </children>
-                           </GridPane>
-                           <Label maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="40.0" prefWidth="322.0" text="Nota: Si no introduces los datos correctamente, la representacion del mapa no sera precisa." textAlignment="CENTER" textFill="#64748b" wrapText="true" />
-                           <HBox alignment="CENTER" prefHeight="100.0" prefWidth="322.0" spacing="10.0">
-                              <children>
-                                 <Button fx:id="btnCancelar" mnemonicParsing="false" onAction="#descartarAñadirMapa" prefHeight="59.0" prefWidth="123.0" style="-fx-background-color: transparent; -fx-text-fill: #64748b; -fx-font-weight: bold;" text="DESCARTAR" />
-                                 <Button fx:id="btnGuardar" mnemonicParsing="false" onAction="#guardarMapa" prefHeight="56.0" prefWidth="137.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25;" text="AÑADIR" />
+                                 <Button fx:id="btnBorrarMap" mnemonicParsing="false" onAction="#borrarMapa" prefHeight="40.0" prefWidth="127.0" style="-fx-background-color: #ffe4e6; -fx-text-fill: #e11d48; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="Borrar" />
+                                 <Button fx:id="btnSelecMapa" mnemonicParsing="false" onAction="#mapaSeleccionado" prefHeight="40.0" prefWidth="150.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="Seleccionar" />
                               </children>
                            </HBox>
                         </children>
+                        <HBox.margin>
+                           <Insets bottom="10.0" left="30.0" top="10.0" />
+                        </HBox.margin>
+                     </VBox>
+                     <VBox fx:id="menuAñadirMapa" alignment="CENTER" prefWidth="400.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                        <children>
+                           <VBox alignment="CENTER" maxHeight="677.0" style="-fx-background-color: white; -fx-background-radius: 20;" VBox.vgrow="ALWAYS">
+                              <children>
+                                 <VBox alignment="TOP_CENTER" prefHeight="70.0" prefWidth="1024.0">
+                                    <children>
+                                       <Label text="Añadir Mapa">
+                                          <font>
+                                             <Font name="System Bold" size="26.0" />
+                                          </font>
+                                       </Label>
+                                       <Label text="¡Añade un mapa para poder registrar todas tus hazañas!" textFill="#64748b" />
+                                    </children>
+                                    <VBox.margin>
+                                       <Insets bottom="10.0" top="10.0" />
+                                    </VBox.margin>
+                                 </VBox>
+                                 <VBox alignment="CENTER_LEFT" maxWidth="400.0" prefHeight="92.0" prefWidth="389.0" spacing="5.0">
+                                    <children>
+                                       <Label text="NOMBRE DE LA REGION">
+                                          <font>
+                                             <Font name="System Bold" size="13.0" />
+                                          </font>
+                                       </Label>
+                                       <TextField maxWidth="400.0" prefHeight="38.0" prefWidth="400.0" promptText="Ej: Castellon de la Plana" style="-fx-background-radius: 10; -fx-border-radius: 10;" />
+                                    </children>
+                                 </VBox>
+                                 <VBox alignment="CENTER" prefHeight="151.0" prefWidth="1024.0" spacing="10.0">
+                                    <children>
+                                       <Label text="Selecciona un archivo PNG">
+                                          <font>
+                                             <Font name="System Bold" size="18.0" />
+                                          </font>
+                                       </Label>
+                                       <StackPane prefHeight="150.0" prefWidth="200.0">
+                                          <children>
+                                             <Circle fill="#2196f3" radius="51.0" stroke="BLACK" strokeType="INSIDE" />
+                                             <Button fx:id="btnSelectMapa" mnemonicParsing="false" onAction="#mapaSeleccionado" prefHeight="74.0" prefWidth="88.0" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-background-color: #2196F3; -fx-background-radius: 30; -fx-cursor: hand;" text="⏏">
+                                                <font>
+                                                   <Font size="36.0" />
+                                                </font>
+                                             </Button>
+                                          </children>
+                                       </StackPane>
+                                       <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0">
+                                          <children>
+                                             <Label fx:id="labelPathMap" textFill="#0f1012" visible="false">
+                                                <font>
+                                                   <Font size="12.0" />
+                                                </font>
+                                             </Label>
+                                          </children>
+                                       </VBox>
+                                    </children>
+                                    <VBox.margin>
+                                       <Insets />
+                                    </VBox.margin>
+                                 </VBox>
+                                 <VBox alignment="TOP_CENTER" prefHeight="396.0" prefWidth="1024.0" spacing="15.0">
+                                    <children>
+                                       <Label text="Ingrese las coordenadas geograficas del mapa." textFill="#64748b">
+                                          <VBox.margin>
+                                             <Insets top="10.0" />
+                                          </VBox.margin>
+                                       </Label>
+                                       <GridPane hgap="15.0" maxWidth="350.0" prefHeight="186.0" prefWidth="364.0" vgap="15.0">
+                                          <columnConstraints>
+                                             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                          </columnConstraints>
+                                          <rowConstraints>
+                                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          </rowConstraints>
+                                          <children>
+                                             <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0">
+                                                <children>
+                                                   <Label text="LAT. MÁXIMA (NORTE)">
+                                                      <font>
+                                                         <Font name="System Bold" size="13.0" />
+                                                      </font>
+                                                   </Label>
+                                                   <TextField fx:id="txtCoord1" maxWidth="160.0" prefHeight="45.0" prefWidth="160.0" promptText="Ej: 39.0123" style="-fx-background-radius: 10;" />
+                                                </children>
+                                                <GridPane.margin>
+                                                   <Insets right="5.0" />
+                                                </GridPane.margin>
+                                             </VBox>
+                                             <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="1">
+                                                <children>
+                                                   <Label text="LAT. MÍNIMA (SUR)">
+                                                      <font>
+                                                         <Font name="System Bold" size="13.0" />
+                                                      </font>
+                                                   </Label>
+                                                   <TextField fx:id="txtCoord2" maxWidth="160.0" prefHeight="45.0" prefWidth="160.0" promptText="Ej: 38.9102" style="-fx-background-radius: 10;" />
+                                                </children>
+                                             </VBox>
+                                             <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.rowIndex="1">
+                                                <children>
+                                                   <Label text="LONG. MAXIMA (ESTE)">
+                                                      <font>
+                                                         <Font name="System Bold" size="13.0" />
+                                                      </font>
+                                                   </Label>
+                                                   <TextField fx:id="txtCoord3" maxWidth="160.0" prefHeight="45.0" promptText="Ej: -0.2154" style="-fx-background-radius: 10;">
+                                                      <VBox.margin>
+                                                         <Insets right="5.0" />
+                                                      </VBox.margin>
+                                                   </TextField>
+                                                </children>
+                                             </VBox>
+                                             <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                <children>
+                                                   <Label text="LONG. MINIMA (OESTE)">
+                                                      <font>
+                                                         <Font name="System Bold" size="13.0" />
+                                                      </font>
+                                                   </Label>
+                                                   <TextField fx:id="txtCoord4" maxWidth="160.0" prefHeight="45.0" promptText="Ej: -0.1020" style="-fx-background-radius: 10;" />
+                                                </children>
+                                             </VBox>
+                                          </children>
+                                       </GridPane>
+                                       <Label maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="40.0" prefWidth="322.0" text="Nota: Si no introduces los datos correctamente, la representacion del mapa no sera precisa." textAlignment="CENTER" textFill="#64748b" wrapText="true" />
+                                       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="322.0" spacing="10.0">
+                                          <children>
+                                             <Button fx:id="btnCancelar" mnemonicParsing="false" onAction="#descartarAñadirMapa" prefHeight="40.0" prefWidth="150.0" style="-fx-background-color: transparent; -fx-text-fill: #64748b; -fx-font-weight: bold;" text="DESCARTAR" />
+                                             <Button fx:id="btnGuardar" mnemonicParsing="false" onAction="#guardarMapa" prefHeight="40.0" prefWidth="150.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="AÑADIR" />
+                                          </children>
+                                       </HBox>
+                                    </children>
+                                 </VBox>
+                              </children>
+                           </VBox>
+                        </children>
+                        <HBox.margin>
+                           <Insets bottom="10.0" right="30.0" top="10.0" />
+                        </HBox.margin>
                      </VBox>
                   </children>
-               </VBox>
+               </HBox>
             </children>
          </VBox>
 
