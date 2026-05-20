@@ -1,15 +1,9 @@
 package mapademo;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
-import java.util.Set;
-import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -63,10 +57,6 @@ public class AuthController {
     private BooleanProperty validLogUser;
     private BooleanProperty validLogPass;
     
-    private ChangeListener<String> validUserLetter;
-    private ChangeListener<String> validEmailLetter;
-    private ChangeListener<String> validPassLetter;
-    private ChangeListener<String> validDateLetter;
     @FXML
     private Label labelErrUser;
     @FXML
@@ -86,94 +76,37 @@ public class AuthController {
     
     @FXML
     private void initialize() {
-        //Boton para el cambio entre autentificacion y registro
         enableLog = new SimpleBooleanProperty(Boolean.TRUE);
-        
-        //Validacion para el boton de registro
+
         validUser = new SimpleBooleanProperty(Boolean.FALSE);
         validPass = new SimpleBooleanProperty(Boolean.FALSE);
         validEmail = new SimpleBooleanProperty(Boolean.FALSE);
         validDate = new SimpleBooleanProperty(Boolean.FALSE);
-        
-        //Validacion para el boton de autentificacion
+
         validLogUser = new SimpleBooleanProperty(Boolean.FALSE);
         validLogPass = new SimpleBooleanProperty(Boolean.FALSE);
-        
-        //Se activa si todo es TRUE
+
         btnReg.disableProperty().bind(Bindings.or(validUser.not(), validPass.not()).or(validEmail.not()).or(validDate.not()));
         btnAut.disableProperty().bind(Bindings.or(validLogUser.not(), validLogPass.not()));
-        
-        //Desactivacion y activacion para ver los menus
+
         AuthBox.visibleProperty().bind(enableLog);
         AuthBox.disableProperty().bind(enableLog.not());
         RegBox.visibleProperty().bind(enableLog.not());
         RegBox.disableProperty().bind(enableLog);
-        
-        //Oyentes de los campos del registro
-        txtRegUser.focusedProperty().addListener((obv, oldValue, newValue) ->{
-            if(!newValue){
-                checkUser();
-                if(!validUser.get()){
-                    if(validUserLetter == null){
-                        validUserLetter = (a,b,c) -> checkUser();
-                        txtRegUser.textProperty().addListener(validUserLetter);
-                    }
-                }
-            }
-        });
-        
-        txtRegPass.focusedProperty().addListener((obv, oldValue, newValue) ->{
-            if(!newValue){
-                checkPass();
-                if(!validPass.get()){
-                    if(validPassLetter == null){
-                        validPassLetter = (a,b,c) -> checkPass();
-                        txtRegPass.textProperty().addListener(validPassLetter);
-                    }
-                }
-            }
-        });
-        
-        txtRegEmail.focusedProperty().addListener((obv, oldValue, newValue) ->{
-            if(!newValue){
-                checkEmail();
-                if(!validEmail.get()){
-                    if(validEmailLetter == null){
-                        validEmailLetter = (a,b,c) -> checkEmail();
-                        txtRegEmail.textProperty().addListener(validEmailLetter);
-                    }
-                }
-            }
-        });
-        
-        txtRegDate.focusedProperty().addListener((obv, oldValue, newValue) ->{
-            if(!newValue){
-                checkDate();
-            }
-        });
-        
-        //Oyentes para la autentificacion
-        txtLogUser.focusedProperty().addListener((obv, oldValue, newValue) ->{
-            if(!newValue){
-                if(txtLogUser.getText().length() > 0){
-                    validLogUser.set(true);
-                }else{
-                    validLogUser.set(false);
-                }
-            }
-        });
-        
-        txtLogPass.focusedProperty().addListener((obv, oldValue, newValue) ->{
-            if(!newValue){
-                if(txtLogPass.getText().length() > 0){
-                    validLogPass.set(true);
-                }else{
-                    validLogPass.set(false);
-                }
-            }
-        });
-        
-        
+
+        txtRegUser.textProperty().addListener((a, b, c) -> checkUser());
+        txtRegPass.textProperty().addListener((a, b, c) -> checkPass());
+        txtRegEmail.textProperty().addListener((a, b, c) -> checkEmail());
+        txtRegDate.valueProperty().addListener((a, b, c) -> checkDate());
+
+        txtLogUser.textProperty().addListener((a, b, c) -> validLogUser.set(!txtLogUser.getText().trim().isEmpty()));
+        txtLogPass.textProperty().addListener((a, b, c) -> validLogPass.set(!txtLogPass.getText().trim().isEmpty()));
+
+        labelErrUser.setVisible(false);
+        labelErrPass.setVisible(false);
+        labelErrEmail.setVisible(false);
+        labelErrDate.setVisible(false);
+        labelLogErr.setVisible(false);
     }
 
     @FXML
@@ -195,71 +128,95 @@ public class AuthController {
         enableLog.set(Boolean.FALSE);
         txtLogUser.clear();
         txtLogPass.clear();
-        
+        labelLogErr.setVisible(false);
     }
-    
-    //Muestra de errores copiado de las practicas
-    private void showError(boolean valor, Node nodo, Node labelError){
-        SportActivityApp aux = SportActivityApp.getInstance();
-        if(aux.nickNameExists(txtRegUser.getText())){
-            labelErrUser.setText("NickName ya registrada");
-            valor = false;
-        }else{
-            labelErrUser.setText("Nickname debe de tener de entre 6 y 15 caracteres, y sin caracteres especiales");
-        }
+
+    private void showError(boolean valor, Node nodo, Label labelError, String message) {
+        labelError.setText(message);
         labelError.setVisible(!valor);
         nodo.setStyle(((valor) ? "" : "-fx-background-color: #FCE5E0; -fx-background-radius: 25; -fx-border-radius: 10"));
     }
-    
-    //Metodos auxiliares para las comprobaciones de los campos
-    private void checkUser(){
-        validUser.set(User.checkNickName(txtRegUser.getText()));
-        showError(validUser.get(), txtRegUser, labelErrUser);
+
+    private void checkUser() {
+        boolean ok = User.checkNickName(txtRegUser.getText());
+        if (ok && SportActivityApp.getInstance().nickNameExists(txtRegUser.getText().trim())) {
+            ok = false;
+            showError(false, txtRegUser, labelErrUser, "Nickname ya registrado");
+        } else {
+            showError(ok, txtRegUser, labelErrUser, "Nickname inválido (6-15, letras/dígitos/-/_)");
+        }
+        validUser.set(ok);
     }
-    
-    private void checkPass(){
-        validPass.set(User.checkPassword(txtRegPass.getText()));
-        showError(validPass.get(), txtRegPass, labelErrPass);
+
+    private void checkPass() {
+        String pass = txtRegPass.getText() == null ? "" : txtRegPass.getText().trim();
+        validPass.set(User.checkPassword(pass) || isPasswordValidBySpec(pass));
+        showError(validPass.get(), txtRegPass, labelErrPass, "Contraseña inválida (8-20 con may/min/número/símbolo)");
     }
-    
-    private void checkEmail(){
+
+    private void checkEmail() {
         validEmail.set(User.checkEmail(txtRegEmail.getText()));
-        showError(validEmail.get(), txtRegEmail, labelErrEmail);
+        showError(validEmail.get(), txtRegEmail, labelErrEmail, "Email inválido");
     }
-    
-    private void checkDate(){
-        validDate.set(User.isOlderThan(txtRegDate.getValue(), 13));
-        showError(validDate.get(), txtRegDate, labelErrDate);
+
+    private void checkDate() {
+        validDate.set(txtRegDate.getValue() != null && User.isOlderThan(txtRegDate.getValue(), 12));
+        showError(validDate.get(), txtRegDate, labelErrDate, "Debes ser mayor de 12 años");
     }
 
     @FXML
     private void pasarAlMenu(ActionEvent event) throws IOException {
-        SportActivityApp aux = SportActivityApp.getInstance();
-        if((txtLogUser.getText().equals("Pepe") && txtLogPass.getText().equals("12345"))){
+        SportActivityApp app = SportActivityApp.getInstance();
+        boolean ok = app.login(txtLogUser.getText().trim(), txtLogPass.getText());
+        if (ok) {
             labelLogErr.setVisible(false);
             txtLogUser.clear();
             txtLogPass.clear();
             validLogUser.set(false);
             validLogPass.set(false);
-            
+
             MapaDemoApp.setRoot(FXMLLoader.load(getClass().getResource("/FXMLFiles/FXMLMainMenu.fxml")));
-            
-            
-        }else{
+        } else {
             txtLogUser.clear();
             txtLogPass.clear();
-            
+
             txtLogUser.setStyle("-fx-background-color: #FCE5E0; -fx-background-radius: 25; -fx-border-radius: 10");
             txtLogPass.setStyle("-fx-background-color: #FCE5E0; -fx-background-radius: 25; -fx-border-radius: 10");
-            
+
             validLogUser.set(false);
             validLogPass.set(false);
-            
+
             labelLogErr.setVisible(true);
         }
     }
 
-    
-    
+    @FXML
+    private void registrarUsuario(ActionEvent event) {
+        SportActivityApp app = SportActivityApp.getInstance();
+        String password = txtRegPass.getText() == null ? "" : txtRegPass.getText().trim();
+        boolean ok = app.registerUser(
+                txtRegUser.getText().trim(),
+                txtRegEmail.getText().trim(),
+                password,
+                txtRegDate.getValue(),
+                (String) null
+        );
+        if (ok) {
+            mostrarLogin(event);
+        } else {
+            checkUser();
+            checkEmail();
+            checkPass();
+            checkDate();
+        }
+    }
+
+    // Regla explícita del enunciado para evitar falsos negativos de validación UI.
+    private boolean isPasswordValidBySpec(String pass) {
+        if (pass == null) {
+            return false;
+        }
+        return pass.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%&*()\\-+=]).{8,20}$");
+    }
 
 }
