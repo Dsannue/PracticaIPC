@@ -1,5 +1,6 @@
 package mapademo;
 
+import java.io.File;
 import java.io.IOException;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -7,6 +8,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
@@ -73,6 +76,12 @@ public class AuthController {
     private PasswordField txtLogPass;
     @FXML
     private Label labelLogErr;
+    @FXML
+    private Label labelRegAvatarPath;
+    @FXML
+    private Button btnSelectRegAvatar;
+    
+    private String regAvatarPath;
     
     @FXML
     private void initialize() {
@@ -116,6 +125,10 @@ public class AuthController {
         txtRegEmail.clear();
         txtRegPass.clear();
         txtRegDate.setValue(null);
+        regAvatarPath = null;
+        if (labelRegAvatarPath != null) {
+            labelRegAvatarPath.setText("Ninguno seleccionado");
+        }
         
         validUser.set(false);
         validEmail.set(false);
@@ -199,7 +212,7 @@ public class AuthController {
                 txtRegEmail.getText().trim(),
                 password,
                 txtRegDate.getValue(),
-                (String) null
+                regAvatarPath
         );
         if (ok) {
             mostrarLogin(event);
@@ -211,12 +224,23 @@ public class AuthController {
         }
     }
 
-    // Regla explícita del enunciado para evitar falsos negativos de validación UI.
     private boolean isPasswordValidBySpec(String pass) {
         if (pass == null) {
             return false;
         }
         return pass.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%&*()\\-+=]).{8,20}$");
+    }
+
+    @FXML
+    private void seleccionarRegAvatar(ActionEvent event) {
+        FileChooser fc = new FileChooser();
+        fc.setInitialDirectory(new File("."));
+        fc.getExtensionFilters().addAll(new ExtensionFilter("Imagenes", "*.png", "*.jpg", "*.jpeg"));
+        File imgFile = fc.showOpenDialog(btnSelectRegAvatar.getScene().getWindow());
+        if (imgFile != null) {
+            regAvatarPath = imgFile.getAbsolutePath();
+            labelRegAvatarPath.setText(imgFile.getName());
+        }
     }
 
 }

@@ -192,6 +192,21 @@
                                  </font></Label>
                            </children>
                         </VBox>
+                        <VBox spacing="6.0">
+                           <children>
+                              <Label text="AVATAR (OPCIONAL)" textFill="#1e293b">
+                                 <font>
+                                    <Font name="System Bold" size="10.0" />
+                                 </font>
+                              </Label>
+                              <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                 <children>
+                                    <Button fx:id="btnSelectRegAvatar" mnemonicParsing="false" onAction="#seleccionarRegAvatar" style="-fx-background-color: #e2e8f0; -fx-text-fill: #1e293b; -fx-font-weight: bold; -fx-background-radius: 15; -fx-cursor: hand;" text="Elegir Imagen" />
+                                    <Label fx:id="labelRegAvatarPath" text="Ninguno seleccionado" textFill="#64748b" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
                      </children>
                   </VBox>
                   <VBox spacing="15.0">

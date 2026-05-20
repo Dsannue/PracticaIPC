@@ -1,30 +1,4 @@
-/*
- * ============================================================
- *  PROYECTO EJEMPLO – IPC 2026
- *  Asignatura: Interfaces Persona-Computador
- *  Universitat Politècnica de València
- * ============================================================
- *
- *  DESCRIPCIÓN GENERAL
- *  -------------------
- *  Este controlador gestiona la vista principal de la aplicación
- *  de puntos de interés (POI) sobre un mapa.
- *
- *  Funcionalidades implementadas:
- *   1. Carga y visualización de una imagen de mapa.
- *   2. Zoom interactivo mediante un Slider.
- *   3. Añadir POIs (texto) y anotaciones (círculos) con clic derecho.
- *   4. Listado de POIs en un ListView con CellFactory personalizada.
- *   5. Centrado animado del mapa al seleccionar un POI de la lista.
- *   6. Modo inserción: activar con botón y colocar POI con siguiente clic.
- *
- *  PATRÓN UTILIZADO: MVC (Model-View-Controller)
- *   - Modelo : clase Poi  (datos del punto de interés)
- *   - Vista  : FXMLDocument.fxml  (layout declarativo)
- *   - Control: esta clase (lógica de interacción)
- *
- * ============================================================
- */
+
 package mapademo;
 
 import java.io.File;
@@ -70,9 +44,16 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import java.time.format.DateTimeFormatter;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
@@ -92,15 +73,7 @@ import upv.ipc.sportlib.SportActivityApp;
 import upv.ipc.sportlib.TrackPoint;
 import upv.ipc.sportlib.User;
 
-/**
- * Controlador principal de la aplicación de mapa con POIs.
- *
- * La anotación @FXML conecta automáticamente los campos de esta clase
- * con los elementos declarados en el fichero FXML mediante su atributo fx:id.
- *
- * Implementa {@link Initializable} para poder ejecutar código de
- * inicialización una vez que el FXML ha sido cargado completamente.
- */
+
 public class MainMenuController implements Initializable {
 
     private final SportActivityApp app = SportActivityApp.getInstance();
@@ -123,6 +96,10 @@ public class MainMenuController implements Initializable {
     @FXML
     private ScrollPane map_scrollpane;
     @FXML
+    private SplitPane mapAndChartSplitPane;
+    @FXML
+    private VBox vboxElevationProfile;
+    @FXML
     private Slider zoom_slider;
     @FXML
     private Label mousePosition;
@@ -136,6 +113,20 @@ public class MainMenuController implements Initializable {
     private Button btnAtras;
     @FXML
     private Button btnBorrarActividad;
+    @FXML
+    private Label lblDetalleNombre;
+    @FXML
+    private Label lblDetalleDistancia;
+    @FXML
+    private Label lblDetalleDuracion;
+    @FXML
+    private Label lblDetalleDesnivel;
+    @FXML
+    private Label lblDetalleVelocidad;
+    @FXML
+    private Label lblDetalleRitmo;
+    @FXML
+    private Label lblDetalleAltitud;
     @FXML
     private VBox masterView;
     @FXML
@@ -157,6 +148,12 @@ public class MainMenuController implements Initializable {
     @FXML
     private DatePicker dpFecha;
     @FXML
+    private Label lblErrEmailMod;
+    @FXML
+    private Label lblErrPassMod;
+    @FXML
+    private Label lblErrDateMod;
+    @FXML
     private SplitPane menuMapa;
     @FXML
     private VBox menuAñadirMapa;
@@ -173,9 +170,18 @@ public class MainMenuController implements Initializable {
     @FXML
     private VBox menuHistorial;
     @FXML
+    private Label lblTotalSessions;
+    @FXML
+    private Label lblTotalTime;
+    @FXML
+    private VBox vboxRecentSessions;
+    @FXML
     private Button btnVolverDesdeHistorial;
     
     private IntegerProperty cambioPestaña;
+    private BooleanProperty modEmailValid;
+    private BooleanProperty modPassValid;
+    private BooleanProperty modDateValid;
     @FXML
     private Button btnSelectMapa;
     @FXML
@@ -344,6 +350,9 @@ public class MainMenuController implements Initializable {
         menuModPerfil.managedProperty().bind(menuModPerfil.visibleProperty());
         menuHistorial.managedProperty().bind(menuHistorial.visibleProperty());
 
+        detailView.managedProperty().bind(detailView.visibleProperty());
+        masterView.managedProperty().bind(masterView.visibleProperty());
+
         coord1 = new SimpleBooleanProperty(Boolean.FALSE);
         coord2 = new SimpleBooleanProperty(Boolean.FALSE);
         coord3 = new SimpleBooleanProperty(Boolean.FALSE);
@@ -368,6 +377,70 @@ public class MainMenuController implements Initializable {
                 setText(empty || item == null ? null : item.getName());
             }
         });
+
+        modEmailValid = new SimpleBooleanProperty(true);
+        modPassValid = new SimpleBooleanProperty(true);
+        modDateValid = new SimpleBooleanProperty(true);
+
+        btnGuardarModPer.disableProperty().bind(
+            modEmailValid.not().or(modPassValid.not()).or(modDateValid.not())
+        );
+
+        txtEmail.textProperty().addListener((obs, oldVal, newVal) -> {
+            boolean valid = User.checkEmail(newVal);
+            modEmailValid.set(valid);
+            if (valid) {
+                lblErrEmailMod.setVisible(false);
+                txtEmail.setStyle("");
+            } else {
+                lblErrEmailMod.setText("Correo electrónico no válido");
+                lblErrEmailMod.setVisible(true);
+                txtEmail.setStyle("-fx-background-color: #FCE5E0; -fx-border-color: #E74C3C; -fx-border-radius: 8; -fx-background-radius: 8;");
+            }
+        });
+
+        txtPassword.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal == null || newVal.trim().isEmpty()) {
+                modPassValid.set(true);
+                lblErrPassMod.setVisible(false);
+                txtPassword.setStyle("");
+            } else {
+                boolean valid = User.checkPassword(newVal);
+                modPassValid.set(valid);
+                if (valid) {
+                    lblErrPassMod.setVisible(false);
+                    txtPassword.setStyle("");
+                } else {
+                    lblErrPassMod.setText("Contraseña no válida (8-20 car., Mayús, Minús, Núm, Símb)");
+                    lblErrPassMod.setVisible(true);
+                    txtPassword.setStyle("-fx-background-color: #FCE5E0; -fx-border-color: #E74C3C; -fx-border-radius: 8; -fx-background-radius: 8;");
+                }
+            }
+        });
+
+        dpFecha.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal == null) {
+                modDateValid.set(false);
+                lblErrDateMod.setText("Fecha requerida");
+                lblErrDateMod.setVisible(true);
+                dpFecha.setStyle("-fx-background-color: #FCE5E0; -fx-border-color: #E74C3C; -fx-border-radius: 8; -fx-background-radius: 8;");
+            } else {
+                boolean valid = User.isOlderThan(newVal, 12);
+                modDateValid.set(valid);
+                if (valid) {
+                    lblErrDateMod.setVisible(false);
+                    dpFecha.setStyle("");
+                } else {
+                    lblErrDateMod.setText("Debes ser mayor de 12 años");
+                    lblErrDateMod.setVisible(true);
+                    dpFecha.setStyle("-fx-background-color: #FCE5E0; -fx-border-color: #E74C3C; -fx-border-radius: 8; -fx-background-radius: 8;");
+                }
+            }
+        });
+
+        if (mapAndChartSplitPane != null && vboxElevationProfile != null) {
+            mapAndChartSplitPane.getItems().remove(vboxElevationProfile);
+        }
 
         loadProfileData();
         loadActivities();
@@ -424,11 +497,14 @@ public class MainMenuController implements Initializable {
         if (current == null) {
             return;
         }
-        String pass = txtPassword.getText().trim().isEmpty() ? current.getPassword() : txtPassword.getText();
+        String pass = (txtPassword.getText() == null || txtPassword.getText().trim().isEmpty())
+                ? current.getPassword()
+                : txtPassword.getText();
         String avatar = avatarPath == null ? current.getAvatarPath() : avatarPath;
         boolean ok = app.updateCurrentUser(txtEmail.getText().trim(), pass, dpFecha.getValue(), avatar);
         if (ok) {
             txtPassword.clear();
+            loadProfileData();
             showInfo("Perfil actualizado correctamente.");
         } else {
             showInfo("No se pudo actualizar el perfil. Revisa los datos.");
@@ -457,6 +533,23 @@ public class MainMenuController implements Initializable {
             selectedMapFile = null;
             mapaSelected.set(false);
         }
+    }
+
+    @FXML
+    private void seleccionarMapaDeLista(javafx.event.ActionEvent event) {
+        MapRegion selected = mapRegionsList.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showInfo("Selecciona un mapa de la lista para cargarlo.");
+            return;
+        }
+        buildMap(new File(selected.getImagePath()), selected);
+        if (currentActivity != null) {
+            drawRoute(currentActivity);
+            drawAnnotations(currentActivity);
+            centerOnActivityStart(currentActivity);
+        }
+        cambioPestaña.set(0);
+        btnMapChanger.setDisable(false);
     }
 
     @FXML
@@ -509,11 +602,23 @@ public class MainMenuController implements Initializable {
 
     @FXML
     private void logout(javafx.event.ActionEvent event) {
-        app.logout();
-        try {
-            MapaDemoApp.setRoot(javafx.fxml.FXMLLoader.load(getClass().getResource("/FXMLFiles/FXMLAuthentificator.fxml")));
-        } catch (IOException ex) {
-            showInfo("No se pudo volver al login.");
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        Stage dialogStage = (Stage) alert.getDialogPane().getScene().getWindow();
+        if (getClass().getResource("/resources/logoDef.png") != null) {
+            dialogStage.getIcons().add(new Image(getClass().getResourceAsStream("/resources/logoDef.png")));
+        }
+        alert.setTitle("Cerrar Sesión");
+        alert.setHeaderText("¿Estás seguro de que quieres cerrar la sesión?");
+        alert.setContentText("Cualquier cambio sin guardar se perderá.");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            app.logout();
+            try {
+                MapaDemoApp.setRoot(javafx.fxml.FXMLLoader.load(getClass().getResource("/FXMLFiles/FXMLAuthentificator.fxml")));
+            } catch (IOException ex) {
+                showInfo("No se pudo volver al login.");
+            }
         }
     }
 
@@ -554,9 +659,21 @@ public class MainMenuController implements Initializable {
         if (sel == null) {
             return;
         }
-        app.removeActivity(sel);
-        loadActivities();
-        currentActivity = null;
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        Stage dialogStage = (Stage) alert.getDialogPane().getScene().getWindow();
+        if (getClass().getResource("/resources/logoDef.png") != null) {
+            dialogStage.getIcons().add(new Image(getClass().getResourceAsStream("/resources/logoDef.png")));
+        }
+        alert.setTitle("Borrar Actividad");
+        alert.setHeaderText("¿Estás seguro de que quieres borrar esta actividad?");
+        alert.setContentText("Esta acción es permanente y no se puede deshacer.");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            app.removeActivity(sel);
+            ocultarGrafica(null);
+            loadActivities();
+        }
     }
 
     @FXML
@@ -602,12 +719,27 @@ public class MainMenuController implements Initializable {
         if (!activities.isEmpty()) {
             renderActivity(activities.get(0));
             map_listview.getSelectionModel().select(0);
+        } else {
+            renderActivity(null);
         }
     }
 
     private void renderActivity(Activity activity) {
         currentActivity = activity;
         if (activity == null) {
+            try {
+                Pane placeholder = new Pane();
+                ImageView iv = new ImageView(new Image(getClass().getResourceAsStream("/resources/logoDef.png")));
+                iv.setPickOnBounds(true);
+                placeholder.getChildren().add(iv);
+                map_scrollpane.setContent(placeholder);
+            } catch (Exception ex) {
+                map_scrollpane.setContent(null);
+            }
+            zoomGroup = null;
+            mapPane = null;
+            projection = null;
+            populateDetailView(null);
             return;
         }
         MapRegion region = activity.getSuggestedMap();
@@ -622,7 +754,7 @@ public class MainMenuController implements Initializable {
         drawRoute(activity);
         drawAnnotations(activity);
         centerOnActivityStart(activity);
-        showActivitySummary(activity);
+        populateDetailView(activity);
     }
 
     private void drawRoute(Activity activity) {
@@ -788,6 +920,30 @@ public class MainMenuController implements Initializable {
         dpFecha.setValue(current.getBirthDate());
         txtPassword.clear();
         avatarPath = current.getAvatarPath();
+
+        if (lblErrEmailMod != null) lblErrEmailMod.setVisible(false);
+        if (lblErrPassMod != null) lblErrPassMod.setVisible(false);
+        if (lblErrDateMod != null) lblErrDateMod.setVisible(false);
+        if (txtEmail != null) txtEmail.setStyle("");
+        if (txtPassword != null) txtPassword.setStyle("");
+        if (dpFecha != null) dpFecha.setStyle("");
+    }
+
+    private String formatDuration(Duration duration) {
+        if (duration == null) {
+            return "0s";
+        }
+        long totalSeconds = duration.getSeconds();
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long seconds = totalSeconds % 60;
+        if (hours > 0) {
+            return String.format("%dh %dm", hours, minutes);
+        } else if (minutes > 0) {
+            return String.format("%dm %ds", minutes, seconds);
+        } else {
+            return String.format("%ds", seconds);
+        }
     }
 
     private void showSessionSummary() {
@@ -806,23 +962,74 @@ public class MainMenuController implements Initializable {
             annotations += s.getAnnotationsCreated();
             total = total.plus(s.getDuration());
         }
-        showInfo(String.format("Sesiones: %d\nDuración total: %s\nActividades importadas: %d\nActividades visualizadas: %d\nAnotaciones creadas: %d",
-                sessions.size(), total, imported, viewed, annotations));
+        if (lblTotalSessions != null) {
+            lblTotalSessions.setText(String.valueOf(sessions.size()));
+        }
+        if (lblTotalTime != null) {
+            lblTotalTime.setText(formatDuration(total));
+        }
+        if (vboxRecentSessions != null) {
+            vboxRecentSessions.getChildren().clear();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy, HH:mm");
+            for (int i = sessions.size() - 1; i >= 0; i--) {
+                Session s = sessions.get(i);
+                HBox hbox = new HBox();
+                hbox.setAlignment(Pos.CENTER_LEFT);
+                hbox.setSpacing(20.0);
+                hbox.setPadding(new Insets(15, 20, 15, 20));
+                hbox.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 10, 0, 0, 4);");
+
+                Label icon = new Label("📅");
+                icon.setFont(new Font(28.0));
+
+                VBox vboxLeft = new VBox();
+                HBox.setHgrow(vboxLeft, Priority.ALWAYS);
+                Label lblDate = new Label(s.getStartTime() != null ? s.getStartTime().format(formatter) : "Fecha desconocida");
+                lblDate.setTextFill(Color.web("#0f172a"));
+                lblDate.setFont(Font.font("System", FontWeight.BOLD, 16.0));
+                Label lblDuration = new Label("Duración: " + formatDuration(s.getDuration()));
+                lblDuration.setTextFill(Color.web("#64748b"));
+                lblDuration.setFont(new Font(13.0));
+                vboxLeft.getChildren().addAll(lblDate, lblDuration);
+
+                VBox vboxRight = new VBox();
+                vboxRight.setAlignment(Pos.CENTER_RIGHT);
+                Label lblImported = new Label(s.getImportedActivities() + " Rutas");
+                lblImported.setTextFill(Color.web("#2196F3"));
+                lblImported.setFont(Font.font("System", FontWeight.BOLD, 14.0));
+                Label lblAnnotations = new Label(s.getAnnotationsCreated() + " Anotaciones");
+                lblAnnotations.setTextFill(Color.web("#64748b"));
+                lblAnnotations.setFont(new Font(13.0));
+                vboxRight.getChildren().addAll(lblImported, lblAnnotations);
+
+                hbox.getChildren().addAll(icon, vboxLeft, vboxRight);
+                vboxRecentSessions.getChildren().add(hbox);
+            }
+        }
     }
 
-    private void showActivitySummary(Activity activity) {
-        showInfo(String.format(
-                "Actividad: %s\nDistancia: %.2f km\nDuración: %s\nVelocidad media: %.2f km/h\nRitmo medio: %.2f min/km\nDesnivel+: %.0f m\nDesnivel-: %.0f m\nAltitud min/máx: %.0f / %.0f m",
-                activity.getName(),
-                activity.getTotalDistance() / 1000.0,
-                activity.getDuration(),
-                activity.getAverageSpeed(),
-                activity.getAveragePace(),
-                activity.getElevationGain(),
-                activity.getElevationLoss(),
-                activity.getMinElevation(),
-                activity.getMaxElevation()
-        ));
+    private void populateDetailView(Activity activity) {
+        if (activity == null) {
+            detailView.setVisible(false);
+            masterView.setVisible(true);
+            return;
+        }
+        lblDetalleNombre.setText("Actividad: " + activity.getName());
+        lblDetalleDistancia.setText(String.format("Distancia: %.2f km", activity.getTotalDistance() / 1000.0));
+        lblDetalleDuracion.setText("Tiempo: " + formatDuration(activity.getDuration()));
+        lblDetalleDesnivel.setText(String.format("Desnivel: +%.0f m / -%.0f m", activity.getElevationGain(), activity.getElevationLoss()));
+        lblDetalleVelocidad.setText(String.format("Velocidad: %.2f km/h", activity.getAverageSpeed()));
+        lblDetalleRitmo.setText(String.format("Ritmo: %.2f min/km", activity.getAveragePace()));
+        lblDetalleAltitud.setText(String.format("Altitud mín/máx: %.0f / %.0f m", activity.getMinElevation(), activity.getMaxElevation()));
+
+        masterView.setVisible(false);
+        detailView.setVisible(true);
+    }
+
+    @FXML
+    private void volverAlMaster(javafx.event.ActionEvent event) {
+        detailView.setVisible(false);
+        masterView.setVisible(true);
     }
 
     private void loadMapRegions() {
@@ -853,6 +1060,9 @@ public class MainMenuController implements Initializable {
         }
         chart.getData().add(series);
 
+        if (hoverPointMarker != null && mapPane != null) {
+            mapPane.getChildren().remove(hoverPointMarker);
+        }
         hoverPointMarker = new Circle(6, Color.ORANGE);
         hoverPointMarker.setVisible(false);
         if (mapPane != null) {
@@ -879,12 +1089,27 @@ public class MainMenuController implements Initializable {
             }
         });
 
-        Dialog<Void> dialog = new Dialog<>();
-        dialog.setTitle("Perfil de desnivel");
-        dialog.getDialogPane().setPrefSize(900, 600);
-        dialog.getDialogPane().setContent(chart);
-        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
-        dialog.showAndWait();
+        if (vboxElevationProfile.getChildren().size() > 1) {
+            vboxElevationProfile.getChildren().remove(1, vboxElevationProfile.getChildren().size());
+        }
+        VBox.setVgrow(chart, Priority.ALWAYS);
+        vboxElevationProfile.getChildren().add(chart);
+
+        if (mapAndChartSplitPane != null && !mapAndChartSplitPane.getItems().contains(vboxElevationProfile)) {
+            mapAndChartSplitPane.getItems().add(vboxElevationProfile);
+            mapAndChartSplitPane.setDividerPositions(0.7);
+        }
+    }
+
+    @FXML
+    private void ocultarGrafica(javafx.event.ActionEvent event) {
+        if (mapAndChartSplitPane != null && vboxElevationProfile != null) {
+            mapAndChartSplitPane.getItems().remove(vboxElevationProfile);
+        }
+        if (hoverPointMarker != null && mapPane != null) {
+            mapPane.getChildren().remove(hoverPointMarker);
+            hoverPointMarker = null;
+        }
     }
 
     private int nearestTrackPointIndex(List<TrackPoint> points, double km) {

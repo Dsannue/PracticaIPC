@@ -27,6 +27,9 @@ public class MapaDemoApp extends Application {
         scene = new Scene(root);
         stage.setTitle("Running La Safor");
         stage.setScene(scene);
+        stage.setOnCloseRequest(e -> {
+            upv.ipc.sportlib.SportActivityApp.getInstance().logout();
+        });
         stage.show();
     }
     

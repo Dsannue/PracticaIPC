@@ -45,18 +45,21 @@
                         <children>
                            <HBox alignment="CENTER_LEFT" spacing="10.0">
                               <children>
-                                 <Button fx:id="btnAtras" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: #2196F3; -fx-font-weight: bold; -fx-cursor: hand;" text="&lt; Atrás" />
+                                 <Button fx:id="btnAtras" mnemonicParsing="false" onAction="#volverAlMaster" style="-fx-background-color: transparent; -fx-text-fill: #2196F3; -fx-font-weight: bold; -fx-cursor: hand;" text="&lt; Atrás" />
                                  <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="Detalles de Ruta" />
                               </children>
                            </HBox>
                            <VBox spacing="8.0" style="-fx-background-color: #f8fafc; -fx-padding: 15; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;" VBox.vgrow="ALWAYS">
                               <children>
-                                 <Label text="Actividad: Carrera Nocturna" textFill="#0f172a" wrapText="true">
+                                 <Label fx:id="lblDetalleNombre" text="Actividad: Carrera Nocturna" textFill="#0f172a" wrapText="true">
                                     <font><Font name="System Bold" size="14.0" /></font>
                                  </Label>
-                                 <Label text="Distancia: 12.5 km" textFill="#64748b" />
-                                 <Label text="Tiempo: 1h 05m" textFill="#64748b" />
-                                 <Label text="Desnivel: +150m" textFill="#ff4b2b" />
+                                 <Label fx:id="lblDetalleDistancia" text="Distancia: 12.5 km" textFill="#64748b" />
+                                 <Label fx:id="lblDetalleDuracion" text="Tiempo: 1h 05m" textFill="#64748b" />
+                                 <Label fx:id="lblDetalleDesnivel" text="Desnivel: +150m" textFill="#ff4b2b" />
+                                 <Label fx:id="lblDetalleVelocidad" text="Velocidad: 0 km/h" textFill="#64748b" />
+                                 <Label fx:id="lblDetalleRitmo" text="Ritmo: 0 min/km" textFill="#64748b" />
+                                 <Label fx:id="lblDetalleAltitud" text="Altitud mín/máx: 0 / 0 m" textFill="#64748b" />
                               </children>
                            </VBox>
                            <Button fx:id="btnBorrarActividad" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#borrarActividadSeleccionada" prefHeight="40.0" style="-fx-background-color: #ffe4e6; -fx-text-fill: #e11d48; -fx-font-weight: bold; -fx-background-radius: 8;" text="Borrar Actividad" />
@@ -87,19 +90,37 @@
                   </children>
                </StackPane>
 
-               <ScrollPane fx:id="map_scrollpane" hbarPolicy="ALWAYS" onMouseMoved="#showPosition" pannable="true" style="-fx-background-color: #f1f5f9;" vbarPolicy="ALWAYS">
-                  <content>
-                     <Pane>
+               <SplitPane fx:id="mapAndChartSplitPane" orientation="VERTICAL" style="-fx-background-color: transparent;">
+                  <items>
+                     <ScrollPane fx:id="map_scrollpane" hbarPolicy="ALWAYS" onMouseMoved="#showPosition" pannable="true" style="-fx-background-color: #f1f5f9;" vbarPolicy="ALWAYS">
+                        <content>
+                           <Pane>
+                              <children>
+                                 <ImageView pickOnBounds="true">
+                                    <image>
+                                       <Image url="@../resources/logoDef.png" />
+                                    </image>
+                                 </ImageView>
+                              </children>
+                           </Pane>
+                        </content>
+                     </ScrollPane>
+                     <VBox fx:id="vboxElevationProfile" prefHeight="220.0" spacing="10.0" style="-fx-background-color: white;">
+                        <padding>
+                           <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
+                        </padding>
                         <children>
-                           <ImageView pickOnBounds="true">
-                              <image>
-                                 <Image url="@../resources/logoDef.png" />
-                              </image>
-                           </ImageView>
+                           <HBox alignment="CENTER_LEFT" spacing="10.0">
+                              <children>
+                                 <Label style="-fx-font-weight: bold; -fx-font-size: 13px;" text="📊 PERFIL DE ALTITUD" textFill="#0f172a" />
+                                 <Region HBox.hgrow="ALWAYS" />
+                                 <Button fx:id="btnCerrarGrafica" mnemonicParsing="false" onAction="#ocultarGrafica" style="-fx-background-color: transparent; -fx-text-fill: #94a3b8; -fx-font-weight: bold; -fx-cursor: hand;" text="✕" />
+                              </children>
+                           </HBox>
                         </children>
-                     </Pane>
-                  </content>
-               </ScrollPane>
+                     </VBox>
+                  </items>
+               </SplitPane>
             </items>
          </SplitPane>
          <VBox fx:id="menuGestionMapas" prefHeight="200.0" prefWidth="100.0">
@@ -136,7 +157,7 @@
                            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                               <children>
                                  <Button fx:id="btnBorrarMap" mnemonicParsing="false" onAction="#borrarMapa" prefHeight="40.0" prefWidth="127.0" style="-fx-background-color: #ffe4e6; -fx-text-fill: #e11d48; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="Borrar" />
-                                 <Button fx:id="btnSelecMapa" mnemonicParsing="false" onAction="#mapaSeleccionado" prefHeight="40.0" prefWidth="150.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="Seleccionar" />
+                                 <Button fx:id="btnSelecMapa" mnemonicParsing="false" onAction="#seleccionarMapaDeLista" prefHeight="40.0" prefWidth="150.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="Seleccionar" />
                               </children>
                            </HBox>
                         </children>
@@ -335,18 +356,21 @@
                                     <children>
                                        <Label text="CORREO ELECTRÓNICO" textFill="#1e293b"><font><Font name="System Bold" size="10.0" /></font></Label>
                                        <TextField fx:id="txtEmail" prefHeight="45.0" prefWidth="420.0" promptText="usuario@email.com" style="-fx-background-radius: 8;" />
+                                       <Label fx:id="lblErrEmailMod" textFill="RED" visible="false"><font><Font name="System Italic" size="12.0" /></font></Label>
                                     </children>
                                  </VBox>
                                  <VBox prefHeight="72.0" prefWidth="420.0" spacing="6.0">
                                     <children>
                                        <Label text="NUEVA CONTRASEÑA" textFill="#1e293b"><font><Font name="System Bold" size="10.0" /></font></Label>
                                        <PasswordField fx:id="txtPassword" maxWidth="350.0" prefHeight="45.0" promptText="••••••••" style="-fx-background-radius: 8;" />
+                                       <Label fx:id="lblErrPassMod" textFill="RED" visible="false"><font><Font name="System Italic" size="12.0" /></font></Label>
                                     </children>
                                  </VBox>
                                  <VBox prefHeight="77.0" prefWidth="420.0" spacing="6.0">
                                     <children>
                                        <Label text="FECHA DE NACIMIENTO" textFill="#1e293b"><font><Font name="System Bold" size="10.0" /></font></Label>
                                        <DatePicker fx:id="dpFecha" maxWidth="220.0" prefHeight="45.0" style="-fx-border-radius: 8;" />
+                                       <Label fx:id="lblErrDateMod" textFill="RED" visible="false"><font><Font name="System Italic" size="12.0" /></font></Label>
                                     </children>
                                  </VBox>
                               </children>
@@ -402,14 +426,14 @@
                               <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
                               <children>
                                  <Label text="💻 SESIONES INICIADAS" textFill="#64748b"><font><Font name="System Bold" size="11.0" /></font></Label>
-                                 <Label text="42" textFill="#2196F3"><font><Font name="System Bold" size="32.0" /></font></Label>
+                                 <Label fx:id="lblTotalSessions" text="42" textFill="#2196F3"><font><Font name="System Bold" size="32.0" /></font></Label>
                               </children>
                            </VBox>
                            <VBox spacing="8.0" style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 15, 0, 0, 5);" GridPane.columnIndex="1">
                               <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
                               <children>
                                  <Label text="⏱️ TIEMPO DE USO" textFill="#64748b"><font><Font name="System Bold" size="11.0" /></font></Label>
-                                 <Label text="18h 45m" textFill="#ff4b2b"><font><Font name="System Bold" size="32.0" /></font></Label>
+                                 <Label fx:id="lblTotalTime" text="18h 45m" textFill="#ff4b2b"><font><Font name="System Bold" size="32.0" /></font></Label>
                               </children>
                            </VBox>
                         </children>
@@ -420,7 +444,7 @@
                            <Label text="REGISTROS RECIENTES" textFill="#1e293b"><font><Font name="System Bold" size="12.0" /></font></Label>
                            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
                               <content>
-                                 <VBox spacing="15.0">
+                                 <VBox fx:id="vboxRecentSessions" spacing="15.0">
                                     <padding><Insets bottom="10.0" left="5.0" right="5.0" top="5.0" /></padding>
                                     <children>
                                        <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 10, 0, 0, 4);">
