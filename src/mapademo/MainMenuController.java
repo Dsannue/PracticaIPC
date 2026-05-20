@@ -30,6 +30,8 @@ package mapademo;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.animation.KeyFrame;
@@ -40,7 +42,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
@@ -55,13 +56,16 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
@@ -71,12 +75,22 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.Polyline;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-import mapademo.Poi;
+import upv.ipc.sportlib.Activity;
+import upv.ipc.sportlib.Annotation;
+import upv.ipc.sportlib.AnnotationType;
+import upv.ipc.sportlib.GeoPoint;
+import upv.ipc.sportlib.MapProjection;
+import upv.ipc.sportlib.MapRegion;
+import upv.ipc.sportlib.Session;
+import upv.ipc.sportlib.SportActivityApp;
+import upv.ipc.sportlib.TrackPoint;
+import upv.ipc.sportlib.User;
 
 /**
  * Controlador principal de la aplicación de mapa con POIs.
@@ -89,79 +103,27 @@ import mapademo.Poi;
  */
 public class MainMenuController implements Initializable {
 
-    // =========================================================
-    //  ESTRUCTURA DE NODOS PARA ZOOM
-    // =========================================================
-    //
-    //  El zoom se consigue escalando un Group (zoomGroup).
-    //  Escalar un Group NO desplaza los nodos que contiene,
-    //  lo que evita el "salto" visual al hacer zoom.
-    //
-    //  Jerarquía de nodos:
-    //
-    //  ScrollPane (map_scrollpane)
-    //   └─ contentGroup          ← Group raíz dentro del ScrollPane
-    //       └─ zoomGroup         ← se escala para el zoom
-    //           └─ mapPane       ← Pane con la imagen y los POIs
-    //               ├─ ImageView ← imagen del mapa
-    //               ├─ Text      ← etiquetas de POIs
-    //               └─ Circle    ← anotaciones circulares
-    //
-    // =========================================================
+    private final SportActivityApp app = SportActivityApp.getInstance();
 
-    /** Group que se escala para aplicar el zoom. */
     private Group zoomGroup;
-
-    /**
-     * Pane que actúa como lienzo del mapa.
-     * Contiene la imagen de fondo y todos los elementos superpuestos
-     * (textos, círculos, etc.). Sus dimensiones coinciden con las de
-     * la imagen cargada.
-     */
     private Pane mapPane;
-
-    
-    /** Menú contextual reutilizable para el clic derecho sobre el mapa. */
+    private MapProjection projection;
     private ContextMenu mapContextMenu;
+    private Activity currentActivity;
+    private AnnotationType pendingType;
+    private GeoPoint pendingFirstPoint;
+    private String pendingColor = "#E74C3C";
+    private String pendingText = "";
+    private File selectedMapFile;
+    private String avatarPath;
+    private Circle hoverPointMarker;
 
-
-    /**
-     * Indica si el controlador está en modo inserción de POI.
-     * {@code true} → el próximo clic izquierdo sobre el mapa abre el diálogo.
-     */
-    private boolean insertionMode = false;
-
-    // =========================================================
-    //  ELEMENTOS FXML  (inyectados automáticamente por el cargador)
-    // =========================================================
-
-    /** Lista lateral que muestra todos los POIs añadidos al mapa. */
     @FXML
-    private ListView<Poi> map_listview;
-
-    /** ScrollPane que envuelve el mapa y permite desplazarlo. */
+    private ListView<Activity> map_listview;
     @FXML
     private ScrollPane map_scrollpane;
-
-    /**
-     * Slider de zoom.
-     * Rango: [0.5 – 1.5]. Valor inicial: 1.0 (sin zoom).
-     * Cada cambio de valor llama al método zoom().
-     */
     @FXML
     private Slider zoom_slider;
-
-    /**
-     * Botón de pin visible sobre el mapa.
-     * Se desplaza hasta la posición del POI seleccionado en la lista.
-     */
-    private MenuButton map_pin;
-
-    // FIX 5 — Eliminadas las variables sin uso:
-    //   · 'mousePosistion' (errata + duplicado de mousePosition)
-    //   · 'pin_info'       (inyectada pero nunca actualizada)
-
-    /** Etiqueta en la barra de estado que muestra las coordenadas del ratón. */
     @FXML
     private Label mousePosition;
     @FXML
@@ -199,6 +161,8 @@ public class MainMenuController implements Initializable {
     @FXML
     private VBox menuAñadirMapa;
     @FXML
+    private VBox menuGestionMapas;
+    @FXML
     private VBox menuModPerfil;
     @FXML
     private Button btnCamAvaModPer;
@@ -216,6 +180,14 @@ public class MainMenuController implements Initializable {
     private Button btnSelectMapa;
     @FXML
     private Label labelPathMap;
+    @FXML
+    private Button btnBorrarMap;
+    @FXML
+    private Button btnSelecMapa;
+    @FXML
+    private TextField txtNombreRegion;
+    @FXML
+    private ListView<MapRegion> mapRegionsList;
     
     private BooleanProperty coord1;
     private BooleanProperty coord2;
@@ -231,8 +203,6 @@ public class MainMenuController implements Initializable {
     @FXML
     private TextField txtCoord4;
     
-    private File map;
-    @FXML
     private Button btnVolverDesdeAñadirMapa;
     @FXML
     private MenuItem btnLogOut;
@@ -241,539 +211,261 @@ public class MainMenuController implements Initializable {
     @FXML
     private MenuItem btnHistorialSesion;
     
- 
-
-    // =========================================================
-    //  MANEJADORES DE ZOOM
-    // =========================================================
-
-    /**
-     * Aumenta el zoom en 0.1 unidades al pulsar el botón "+".
-     *
-     * @param event evento de acción del botón
-     */
     @FXML
-    void zoomIn(ActionEvent event) {
+    void zoomIn(javafx.event.ActionEvent event) {
         double sliderVal = zoom_slider.getValue();
         zoom_slider.setValue(sliderVal + 0.1);
     }
 
-    /**
-     * Reduce el zoom en 0.1 unidades al pulsar el botón "–".
-     *
-     * @param event evento de acción del botón
-     */
     @FXML
-    void zoomOut(ActionEvent event) {
+    void zoomOut(javafx.event.ActionEvent event) {
         double sliderVal = zoom_slider.getValue();
         zoom_slider.setValue(sliderVal - 0.1);
     }
 
-    /**
-     * Aplica el factor de escala al {@code zoomGroup}.
-     *
-     * Este método es invocado automáticamente cada vez que cambia el
-     * valor del slider, gracias al listener registrado en {@link #initialize}.
-     *
-     * Truco: guardamos y restauramos los valores de scroll para que el
-     * contenido visible no salte al cambiar la escala.
-     *
-     * @param scaleValue nuevo factor de escala (p. ej. 1.2 → 120 %)
-     */
     private void zoom(double scaleValue) {
-        // Guardamos la posición del scroll antes de escalar
+        if (zoomGroup == null) {
+            return;
+        }
         double scrollH = map_scrollpane.getHvalue();
         double scrollV = map_scrollpane.getVvalue();
-
-        // Aplicamos el zoom escalando el Group en ambos ejes
         zoomGroup.setScaleX(scaleValue);
         zoomGroup.setScaleY(scaleValue);
-
-        // Restauramos la posición del scroll para que el centro visual
-        // permanezca estable durante el zoom
         map_scrollpane.setHvalue(scrollH);
         map_scrollpane.setVvalue(scrollV);
     }
 
-    // =========================================================
-    //  SELECCIÓN EN EL LISTVIEW → CENTRADO EN EL MAPA
-    // =========================================================
-
-    /**
-     * Se ejecuta cuando el usuario hace clic en un elemento del ListView.
-     *
-     * Objetivo: centrar el ScrollPane sobre la posición del POI seleccionado
-     * con una animación suave de 500 ms, y mover el pin al punto.
-     *
-     * Cálculo del scroll
-     * ------------------
-     * El ScrollPane expresa su posición como valores normalizados [0, 1]:
-     *   · hValue = 0 → extremo izquierdo
-     *   · hValue = 1 → extremo derecho
-     *
-     * Para centrar el POI necesitamos:
-     *
-     *   scrollH = (poiX_escalado - viewportAncho / 2)
-     *             ─────────────────────────────────────
-     *             (mapaAncho_escalado - viewportAncho)
-     *
-     * Aplicamos clamp para no salir del rango [0, 1].
-     *
-     * @param event evento de ratón sobre el ListView
-     */
     @FXML
     void listClicked(MouseEvent event) {
-        // Obtenemos el POI seleccionado; si no hay ninguno, salimos
-        Poi itemSelected = map_listview.getSelectionModel().getSelectedItem();
-        if (itemSelected == null) return;
-
-        // ── Dimensiones del mapa con el zoom actual aplicado ──────────
-        double mapWidth  = mapPane.getWidth()  * zoomGroup.getScaleX();
-        double mapHeight = mapPane.getHeight() * zoomGroup.getScaleY();
-
-        // ── Posición del POI escalada ──────────────────────────────────
-        // getPosition() devuelve las coordenadas en el sistema local del
-        // mapPane (sin zoom). Las multiplicamos por el factor de escala
-        // para obtener la posición real en pantalla.
-        double poiX = itemSelected.getPosition().getX() * zoomGroup.getScaleX();
-        double poiY = itemSelected.getPosition().getY() * zoomGroup.getScaleY();
-
-        // ── Tamaño visible del ScrollPane (viewport) ───────────────────
-        double viewW = map_scrollpane.getViewportBounds().getWidth();
-        double viewH = map_scrollpane.getViewportBounds().getHeight();
-
-        // ── Cálculo del scroll normalizado [0, 1] ─────────────────────
-        // Restamos la mitad del viewport para que el POI quede centrado
-        // y no en la esquina superior-izquierda del área visible.
-        double scrollH = (poiX - viewW / 2) / (mapWidth  - viewW);
-        double scrollV = (poiY - viewH / 2) / (mapHeight - viewH);
-
-        // Garantizamos que el valor esté dentro del rango válido [0, 1]
-        scrollH = Math.max(0, Math.min(1, scrollH));
-        scrollV = Math.max(0, Math.min(1, scrollV));
-
-        // ── Animación suave con Timeline ──────────────────────────────
-        // Timeline interpola los valores de las propiedades a lo largo
-        // del tiempo. KeyValue define qué propiedad animar y hasta qué
-        // valor; KeyFrame define en qué instante se alcanza ese valor.
-        final Timeline timeline = new Timeline();
-        final KeyValue kv1 = new KeyValue(map_scrollpane.hvalueProperty(), scrollH);
-        final KeyValue kv2 = new KeyValue(map_scrollpane.vvalueProperty(), scrollV);
-        final KeyFrame kf  = new KeyFrame(Duration.millis(500), kv1, kv2);
-        timeline.getKeyFrames().add(kf);
-        timeline.play(); // Inicia la animación (no bloquea el hilo de la UI)
-
+        Activity selected = map_listview.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            return;
+        }
+        renderActivity(selected);
+        if (event.getClickCount() >= 2) {
+            showElevationProfile(selected);
+        }
     }
 
-    // =========================================================
-    //  CONSTRUCCIÓN DEL MAPA
-    // =========================================================
-
-    /**
-     * Carga una imagen y construye la jerarquía de nodos del mapa.
-     *
-     * Este método puede llamarse varias veces (p. ej. al cambiar el mapa),
-     * ya que sustituye completamente el contenido del ScrollPane.
-     *
-     * @param imgFile fichero de imagen a cargar como fondo del mapa
-     */
-    private void buildMap(File imgFile) {
-        // Comprobación defensiva: si el fichero no existe mostramos un aviso
-        if (!imgFile.exists()) {
-            map_scrollpane.setContent(
-                new Label("Imagen no encontrada: " + imgFile.getPath()));
+    private void buildMap(File imageFile, MapRegion region) {
+        if (imageFile == null || !imageFile.exists()) {
+            map_scrollpane.setContent(new Label("Imagen no encontrada: " + (imageFile == null ? "-" : imageFile.getPath())));
             return;
         }
 
-        // Cargamos la imagen y obtenemos sus dimensiones reales en píxeles
-        Image img = new Image(imgFile.toURI().toString());
-        double W = img.getWidth();
-        double H = img.getHeight();
-
-        // ── mapPane: lienzo del mapa ───────────────────────────────────
-        // Usamos un Pane (y no un Group) para poder posicionar los nodos
-        // hijos con coordenadas absolutas (setLayoutX / setLayoutY).
+        Image img = new Image(imageFile.toURI().toString());
+        projection = new MapProjection(region, img.getWidth(), img.getHeight());
         mapPane = new Pane();
-        mapPane.setPrefSize(W, H); // tamaño preferido = tamaño de la imagen
-        mapPane.setMinSize(W, H);  // impedimos que el layout lo encoja
-        mapPane.setMaxSize(W, H);  // impedimos que el layout lo agrande
+        mapPane.setPrefSize(img.getWidth(), img.getHeight());
 
-        // Añadimos la imagen como fondo del Pane
         ImageView iv = new ImageView(img);
-        iv.setFitWidth(W);
-        iv.setFitHeight(H);
+        iv.setFitWidth(img.getWidth());
+        iv.setFitHeight(img.getHeight());
         mapPane.getChildren().add(iv);
 
-        // ── Manejador de clics sobre el mapa ──────────────────────────
-        // Gestionamos el clic derecho (menú contextual) y el clic izquierdo
-        // en modo inserción (FIX 2).
         mapPane.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
-                // Clic derecho → mostrar menú contextual
                 onMapRightClick(e.getX(), e.getY());
-
-            } else if (e.getButton() == MouseButton.PRIMARY && insertionMode) {
-                // FIX 2: clic izquierdo en modo inserción → añadir POI y desactivar modo
-                insertionMode = false;
-                mapPane.setStyle(""); // Restauramos el cursor normal
-                addPoi(e.getX(), e.getY());
+            } else if (e.getButton() == MouseButton.PRIMARY && pendingType != null && pendingFirstPoint != null) {
+                GeoPoint second = projection.unproject(e.getX(), e.getY());
+                saveAnnotation(pendingType, pendingText, pendingColor, List.of(pendingFirstPoint, second));
+                pendingType = null;
+                pendingFirstPoint = null;
+                pendingText = "";
+                pendingColor = "#E74C3C";
+                mapPane.setStyle("");
             }
         });
 
-        // ── Jerarquía de Groups para el zoom ──────────────────────────
-        // contentGroup es el nodo raíz que recibe el ScrollPane.
-        // zoomGroup es el que se escala; anidar un Group dentro de otro
-        // evita que el ScrollPane reajuste su contenido durante el escalado.
         zoomGroup = new Group();
         Group contentGroup = new Group();
         zoomGroup.getChildren().add(mapPane);
         contentGroup.getChildren().add(zoomGroup);
-
-        // Aplicamos el zoom actual (valor actual del slider)
         double zoom = zoom_slider.getValue();
         zoomGroup.setScaleX(zoom);
         zoomGroup.setScaleY(zoom);
-
-        // Asignamos el contentGroup como contenido del ScrollPane
         map_scrollpane.setContent(contentGroup);
-
     }
 
-    // =========================================================
-    //  MENÚ CONTEXTUAL (clic derecho sobre el mapa)
-    // =========================================================
-
-    /**
-     * Muestra el menú contextual reutilizable en la posición del clic.
-     *
-     * Las acciones de los MenuItem se actualizan con las coordenadas
-     * del clic actual antes de mostrar el menú.
-     *
-     * @param x coordenada X del clic en el sistema local del mapPane
-     * @param y coordenada Y del clic en el sistema local del mapPane
-     */
     private void onMapRightClick(double x, double y) {
-        // FIX 6: cerramos el menú si ya estaba visible (evita instancias flotantes)
+        if (currentActivity == null || projection == null) {
+            showInfo("Selecciona una actividad para añadir anotaciones.");
+            return;
+        }
         mapContextMenu.hide();
-
-        // Actualizamos las acciones de los items con las coordenadas actuales.
-        // Usamos variables final para que el lambda pueda capturarlas.
         final double clickX = x;
         final double clickY = y;
-        mapContextMenu.getItems().get(0).setOnAction(e -> addPoi(clickX, clickY));
-        mapContextMenu.getItems().get(1).setOnAction(e -> addCircle(clickX, clickY));
+        mapContextMenu.getItems().get(0).setOnAction(e -> addAnnotationFromClick(AnnotationType.POINT, clickX, clickY));
+        mapContextMenu.getItems().get(1).setOnAction(e -> addAnnotationFromClick(AnnotationType.TEXT, clickX, clickY));
+        mapContextMenu.getItems().get(2).setOnAction(e -> startTwoPointAnnotation(AnnotationType.LINE, clickX, clickY));
+        mapContextMenu.getItems().get(3).setOnAction(e -> startTwoPointAnnotation(AnnotationType.CIRCLE, clickX, clickY));
 
-        // Mostramos el menú en coordenadas de pantalla
         mapContextMenu.show(
-            mapPane.getScene().getWindow(),
-            mapPane.localToScreen(x, y).getX(),
-            mapPane.localToScreen(x, y).getY()
+                mapPane.getScene().getWindow(),
+                mapPane.localToScreen(x, y).getX(),
+                mapPane.localToScreen(x, y).getY()
         );
     }
 
-    // =========================================================
-    //  INICIALIZACIÓN DEL CONTROLADOR
-    // =========================================================
-
-    /**
-     * Método llamado automáticamente por el FXMLLoader tras inyectar
-     * todos los elementos {@code @FXML}.
-     *
-     * Aquí configuramos:
-     *  - El slider de zoom y su listener.
-     *  - El ContextMenu reutilizable (FIX 6).
-     *  - La CellFactory del ListView (FIX 4).
-     *  - La carga del mapa inicial.
-     *
-     * @param url  URL del documento FXML (no usado aquí)
-     * @param rb   paquete de recursos de internacionalización (no usado aquí)
-     */
     @FXML
     public void initialize(URL url, ResourceBundle rb) {
+        zoom_slider.setMin(0.5);
+        zoom_slider.setMax(1.5);
+        zoom_slider.setValue(1.0);
+        zoom_slider.valueProperty().addListener((observable, oldVal, newVal) -> zoom((Double) newVal));
 
-        // ── Configuración del slider de zoom ──────────────────────────
-        zoom_slider.setMin(0.5);   // zoom mínimo: 50 %
-        zoom_slider.setMax(1.5);   // zoom máximo: 150 %
-        zoom_slider.setValue(1.0); // valor inicial: 100 %
+        MenuItem miPoint = new MenuItem("Añadir punto");
+        MenuItem miText = new MenuItem("Añadir texto");
+        MenuItem miLine = new MenuItem("Añadir línea");
+        MenuItem miCircle = new MenuItem("Añadir círculo");
+        mapContextMenu = new ContextMenu(miPoint, miText, miLine, miCircle);
 
-        // Listener que invoca zoom() cada vez que el slider cambia de valor.
-        // Usamos una expresión lambda en lugar de una clase anónima por brevedad.
-        zoom_slider.valueProperty().addListener(
-            (observable, oldVal, newVal) -> zoom((Double) newVal)
-        );
-
-        // Los items se crean aquí sin acción; las acciones se asignan
-        // en onMapRightClick() con las coordenadas correctas de cada clic.
-        MenuItem miText   = new MenuItem("📝 Añadir texto");
-        MenuItem miCircle = new MenuItem("⭕ Añadir círculo");
-        mapContextMenu = new ContextMenu(miText, miCircle);
-
-               //  setCellFactory() define cómo se renderiza cada celda
-        //  de forma independiente al modelo Poi.
-        //  Aquí mostramos "CÓDIGO – Nombre" en cada fila.
-        map_listview.setCellFactory(listView -> new ListCell<Poi>() {
+        map_listview.setCellFactory(listView -> new ListCell<Activity>() {
             @Override
-            protected void updateItem(Poi poi, boolean empty) {
-                // Siempre llamar a super primero (requerido por JavaFX)
-                super.updateItem(poi, empty);
-
-                if (empty || poi == null) {
-                    // Celda vacía: limpiamos texto y gráfico
+            protected void updateItem(Activity activity, boolean empty) {
+                super.updateItem(activity, empty);
+                if (empty || activity == null) {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    // Mostramos código y nombre separados por un guión largo
-                    setText(poi.getCode() + " – " + poi.getPosition());
+                    setText(activity.getName());
                 }
             }
         });
 
-        // ── Carga del mapa inicial ─────────────────────────────────────
-        // El fichero se busca relativo al directorio de trabajo del proyecto.
-        buildMap(new File("maps/upv.jpg"));
-        
-        //Creo objetos para gestionar las interfaces
         cambioPestaña = new SimpleIntegerProperty(0);
-        
         menuMapa.visibleProperty().bind(Bindings.equal(0, cambioPestaña));
-        menuAñadirMapa.visibleProperty().bind(Bindings.equal(1, cambioPestaña));
+        menuGestionMapas.visibleProperty().bind(Bindings.equal(1, cambioPestaña));
         menuModPerfil.visibleProperty().bind(Bindings.equal(2, cambioPestaña));
         menuHistorial.visibleProperty().bind(Bindings.equal(3, cambioPestaña));
-        
-        
-        //Comprobantes para activar el boton de guardar para añadir el mapa
+
+        menuMapa.managedProperty().bind(menuMapa.visibleProperty());
+        menuGestionMapas.managedProperty().bind(menuGestionMapas.visibleProperty());
+        menuModPerfil.managedProperty().bind(menuModPerfil.visibleProperty());
+        menuHistorial.managedProperty().bind(menuHistorial.visibleProperty());
+
         coord1 = new SimpleBooleanProperty(Boolean.FALSE);
         coord2 = new SimpleBooleanProperty(Boolean.FALSE);
         coord3 = new SimpleBooleanProperty(Boolean.FALSE);
         coord4 = new SimpleBooleanProperty(Boolean.FALSE);
         mapaSelected = new SimpleBooleanProperty(Boolean.FALSE);
-        
+
         btnGuardar.disableProperty().bind(Bindings.or(coord1.not(), coord2.not()).or(coord3.not()).or(coord4.not()).or(mapaSelected.not()));
         txtCoord1.disableProperty().bind(mapaSelected.not());
         txtCoord2.disableProperty().bind(mapaSelected.not());
         txtCoord3.disableProperty().bind(mapaSelected.not());
         txtCoord4.disableProperty().bind(mapaSelected.not());
-        
-    }
 
-    // =========================================================
-    //  INDICADOR DE POSICIÓN DEL RATÓN
-    // =========================================================
+        txtCoord1.textProperty().addListener((a, b, c) -> coord1.set(isDouble(c)));
+        txtCoord2.textProperty().addListener((a, b, c) -> coord2.set(isDouble(c)));
+        txtCoord3.textProperty().addListener((a, b, c) -> coord3.set(isDouble(c)));
+        txtCoord4.textProperty().addListener((a, b, c) -> coord4.set(isDouble(c)));
 
-    /**
-     * Actualiza la etiqueta {@code mousePosition} con las coordenadas
-     * actuales del ratón, tanto en el sistema de la escena como en el
-     * sistema local del nodo sobre el que se mueve.
-     *
-     * Útil para depuración y para que los alumnos comprendan la diferencia
-     * entre coordenadas de escena y coordenadas locales.
-     *
-     * @param event evento de movimiento del ratón
-     */
-    @FXML
-    private void showPosition(MouseEvent event) {
-        mousePosition.setText(
-            "sceneX: " + (int) event.getSceneX() +
-            ", sceneY: " + (int) event.getSceneY() + "\n" +
-            "         X: " + (int) event.getX() +
-            ",          Y: " + (int) event.getY()
-        );
-    }
-
-    // =========================================================
-    //  DIÁLOGO "ACERCA DE"
-    // =========================================================
-
-    /**
-     * Muestra un diálogo informativo con datos de la asignatura.
-     *
-     * Nota: accedemos al Stage del diálogo para poder personalizar
-     * su icono, ya que Alert no expone directamente esa propiedad.
-     *
-     * @param event evento de acción del menú
-     */
-    @FXML
-    private void about(ActionEvent event) {
-        Alert mensaje = new Alert(Alert.AlertType.INFORMATION);
-
-        // Personalizamos el icono de la ventana del diálogo
-        Stage dialogStage = (Stage) mensaje.getDialogPane().getScene().getWindow();
-        dialogStage.getIcons().add(
-            new Image(getClass().getResourceAsStream("/resources/logo.png"))
-        );
-
-        mensaje.setTitle("Acerca de");
-        mensaje.setHeaderText("IPC - 2026");
-        mensaje.showAndWait(); // Bloquea hasta que el usuario cierra el diálogo
-    }
-
-    // =========================================================
-    //  AÑADIR UN POI (texto) AL MAPA
-    // =========================================================
-
-    /**
-     * Muestra un diálogo para introducir el nombre del nuevo POI,
-     * lo añade al ListView y dibuja su etiqueta sobre el mapa.
-     *
-     * @param x coordenada X del clic en el sistema local del mapPane
-     * @param y coordenada Y del clic en el sistema local del mapPane
-     */
-    private void addPoi(double x, double y) {
-
-        // ── Construcción del diálogo personalizado ────────────────────
-        Dialog<Poi> poiDialog = new Dialog<>();
-        poiDialog.setTitle("Nuevo POI");
-        poiDialog.setHeaderText("Introduce un nuevo POI");
-
-        // Personalizamos el icono de la ventana del diálogo
-        Stage dialogStage = (Stage) poiDialog.getDialogPane().getScene().getWindow();
-        dialogStage.getIcons().add(
-            new Image(getClass().getResourceAsStream("/resources/logo.png"))
-        );
-
-        // Botones del diálogo: Aceptar y Cancelar
-        ButtonType okButton = new ButtonType("Aceptar", ButtonBar.ButtonData.OK_DONE);
-        poiDialog.getDialogPane().getButtonTypes().addAll(okButton, ButtonType.CANCEL);
-
-        // Campo de texto para el nombre del POI
-        TextField nameField = new TextField();
-        nameField.setPromptText("Nombre del POI");
-
-        // Layout del contenido del diálogo (VBox con espaciado de 10 px)
-        VBox vbox = new VBox(10, new Label("Nombre:"), nameField);
-        poiDialog.getDialogPane().setContent(vbox);
-
-        // ResultConverter: transforma la selección del botón en un objeto Poi.
-        // FIX 1: ya no usamos coordenadas provisionales (0,0); pasamos (x,y)
-        // directamente al constructor para que el modelo sea coherente desde el inicio.
-        poiDialog.setResultConverter(dialogButton -> {
-            if (dialogButton == okButton) {
-                return new Poi(nameField.getText().trim(), x, y);
+        mapRegionsList.setCellFactory(list -> new ListCell<MapRegion>() {
+            @Override
+            protected void updateItem(MapRegion item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getName());
             }
-            return null;
         });
 
-        // Mostramos el diálogo y esperamos la respuesta del usuario
-        Optional<Poi> result = poiDialog.showAndWait();
+        loadProfileData();
+        loadActivities();
+        loadMapRegions();
+    }
 
-        if (result.isPresent()) {
-            Poi poi = result.get();
+    @FXML
+    private void showPosition(MouseEvent event) {
+        mousePosition.setText("sceneX: " + (int) event.getSceneX() + ", sceneY: " + (int) event.getSceneY());
+    }
 
-            // FIX 1: confirmamos la posición como Point2D para compatibilidad
-            // con getPosition(), usando las mismas coordenadas (x, y).
-            poi.setPosition(new Point2D(x, y));
+    @FXML
+    private void about(javafx.event.ActionEvent event) {
+        Alert mensaje = new Alert(Alert.AlertType.INFORMATION);
+        Stage dialogStage = (Stage) mensaje.getDialogPane().getScene().getWindow();
+        dialogStage.getIcons().add(new Image(getClass().getResourceAsStream("/resources/logoDef.png")));
+        mensaje.setTitle("Acerca de");
+        mensaje.setHeaderText("IPC - 2026");
+        mensaje.setContentText("Running la Safor");
+        mensaje.showAndWait();
+    }
 
-            // Añadimos el POI al ListView (la CellFactory mostrará nombre y código)
-            map_listview.getItems().add(poi);
+    @FXML
+    private void cambiarMapa(javafx.event.ActionEvent event) {
+        cambioPestaña.set(1);
+        btnMapChanger.setDisable(true);
+        loadMapRegions();
+    }
 
-            // FIX 1: usamos (x, y) tanto para el modelo como para el Text,
-            // garantizando que la etiqueta aparezca exactamente donde se hizo clic.
-            Text text = new Text(poi.getCode());
-            text.setX(x);
-            text.setY(y);
-            mapPane.getChildren().add(text);
+    @FXML
+    private void volverDesdePerfilAlMapa(javafx.event.ActionEvent event) {
+        cambioPestaña.set(0);
+    }
+
+    @FXML
+    private void cambioAvatar(javafx.event.ActionEvent event) {
+        FileChooser fc = new FileChooser();
+        fc.setInitialDirectory(new File("."));
+        fc.getExtensionFilters().addAll(new ExtensionFilter("Imagenes", "*.png", "*.jpg", "*.jpeg"));
+        File imgFile = fc.showOpenDialog(zoom_slider.getScene().getWindow());
+        if (imgFile != null) {
+            avatarPath = imgFile.getAbsolutePath();
         }
     }
 
-    // =========================================================
-    //  CAMBIAR EL MAPA (selector de fichero)
-    // =========================================================
-
-    /**
-     * Abre la interfaz donde tendra para seleccionar un fichero para que el usuario elija una imagen
-     * diferente como mapa y con sus coordenadas.
-     *
-     * FIX 3: se comprueba que imgFile no sea null antes de usarlo,
-     * evitando NullPointerException cuando el usuario cierra el FileChooser
-     * sin seleccionar ningún fichero.
-     *
-     * @param event evento de acción del menú
-     * @throws IOException si hay un problema al obtener la ruta canónica
-     */
     @FXML
-    private void cambiarMapa(ActionEvent event) throws IOException {
-        cambioPestaña.set(1);
-        btnMapChanger.setDisable(true);
-    }
-
-    // =========================================================
-    //  AÑADIR UN CÍRCULO AL MAPA
-    // =========================================================
-
-    /**
-     * Dibuja un círculo rojo de radio 10 px en la posición indicada.
-     *
-     * Ejemplo sencillo de cómo añadir formas vectoriales (Shape) sobre el mapa.
-     * Los alumnos pueden extenderlo para:
-     *  - Elegir color dinámicamente.
-     *  - Asociar información al círculo (tooltip, popup, etc.).
-     *  - Permitir moverlo con arrastrar y soltar (drag and drop).
-     *
-     * @param x coordenada X en el sistema local del mapPane
-     * @param y coordenada Y en el sistema local del mapPane
-     */
-    private void addCircle(double x, double y) {
-        Circle circle = new Circle(10, Color.RED); // radio = 10 px, color = rojo
-        circle.setCenterX(x);
-        circle.setCenterY(y);
-        mapPane.getChildren().add(circle); // Se añade sobre el mapa como cualquier nodo
-    }
-
-
-
-    @FXML
-    private void volverDesdePerfilAlMapa(ActionEvent event) {
+    private void descartarModPerfil(javafx.event.ActionEvent event) {
+        loadProfileData();
     }
 
     @FXML
-    private void cambioAvatar(ActionEvent event) {
+    private void guardarModPerfil(javafx.event.ActionEvent event) {
+        User current = app.getCurrentUser();
+        if (current == null) {
+            return;
+        }
+        String pass = txtPassword.getText().trim().isEmpty() ? current.getPassword() : txtPassword.getText();
+        String avatar = avatarPath == null ? current.getAvatarPath() : avatarPath;
+        boolean ok = app.updateCurrentUser(txtEmail.getText().trim(), pass, dpFecha.getValue(), avatar);
+        if (ok) {
+            txtPassword.clear();
+            showInfo("Perfil actualizado correctamente.");
+        } else {
+            showInfo("No se pudo actualizar el perfil. Revisa los datos.");
+        }
+    }
+
+    @FXML
+    private void volverDesdeHistorial(javafx.event.ActionEvent event) {
+        cambioPestaña.set(0);
+    }
+
+    @FXML
+    private void mapaSeleccionado(javafx.event.ActionEvent event) {
         FileChooser fc = new FileChooser();
-        fc.setInitialDirectory(new File(".")); // Empezamos en el directorio del proyecto
-        fc.getExtensionFilters().addAll(new ExtensionFilter("Imagenes", "*.png"));
-        File imgFile = fc.showOpenDialog(zoom_slider.getScene().getWindow());
-    }
-
-    @FXML
-    private void descartarModPerfil(ActionEvent event) {
-    }
-
-    @FXML
-    private void guardarModPerfil(ActionEvent event) {
-    }
-
-    @FXML
-    private void volverDesdeHistorial(ActionEvent event) {
-    }
-
-    @FXML
-    private void mapaSeleccionado(ActionEvent event) throws IOException {
-        FileChooser fc = new FileChooser();
-        fc.setInitialDirectory(new File(".")); // Empezamos en el directorio del proyecto
-        fc.getExtensionFilters().addAll(new ExtensionFilter("Imagenes", "*.png"));
+        fc.setInitialDirectory(new File("."));
+        fc.getExtensionFilters().addAll(new ExtensionFilter("Imagenes", "*.png", "*.jpg", "*.jpeg"));
         File imgFile = fc.showOpenDialog(zoom_slider.getScene().getWindow());
 
-        // FIX 3: showOpenDialog() devuelve null si el usuario cancela la selección
         if (imgFile != null) {
-            //Actualizar label del path
             labelPathMap.setVisible(true);
             labelPathMap.setText(imgFile.getAbsolutePath());
-            map = imgFile;// Reconstruimos la vista con la nueva imagen
+            selectedMapFile = imgFile;
             mapaSelected.set(true);
-        }else{
+        } else {
             labelPathMap.setVisible(false);
-            map = null;
+            selectedMapFile = null;
             mapaSelected.set(false);
         }
     }
 
     @FXML
-    private void descartarAñadirMapa(ActionEvent event) {
-        map = null;
+    private void descartarAñadirMapa(javafx.event.ActionEvent event) {
+        selectedMapFile = null;
         txtCoord1.clear();
         txtCoord2.clear();
         txtCoord3.clear();
         txtCoord4.clear();
-        
         labelPathMap.setVisible(false);
         mapaSelected.set(false);
         coord1.set(false);
@@ -783,37 +475,476 @@ public class MainMenuController implements Initializable {
     }
 
     @FXML
-    private void guardarMapa(ActionEvent event) {
-        buildMap(map);
-        map_listview.getItems().clear();
+    private void guardarMapa(javafx.event.ActionEvent event) {
+        if (selectedMapFile == null) {
+            return;
+        }
+        String name = txtNombreRegion.getText() == null || txtNombreRegion.getText().trim().isEmpty()
+                ? selectedMapFile.getName()
+                : txtNombreRegion.getText().trim();
+        MapRegion region = app.addMapRegion(
+                name,
+                selectedMapFile,
+                Double.parseDouble(txtCoord2.getText()),
+                Double.parseDouble(txtCoord1.getText()),
+                Double.parseDouble(txtCoord4.getText()),
+                Double.parseDouble(txtCoord3.getText())
+        );
+        if (region != null) {
+            showInfo("Mapa añadido: " + region.getName());
+            descartarAñadirMapa(event);
+            loadMapRegions();
+        } else {
+            showInfo("No se pudo añadir el mapa.");
+        }
         btnMapChanger.setDisable(false);
-        
-        
+        cambioPestaña.set(0);
     }
 
     @FXML
-    private void volverDesdeAñadirMapa(ActionEvent event) {
-        menuMapa.setVisible(true);
-        menuMapa.setDisable(false);
-        menuAñadirMapa.setVisible(false);
-        menuAñadirMapa.setDisable(true);
+    private void volverDesdeAñadirMapa(javafx.event.ActionEvent event) {
+        cambioPestaña.set(0);
         btnMapChanger.setDisable(false);
     }
 
     @FXML
-    private void logout(ActionEvent event) {
+    private void logout(javafx.event.ActionEvent event) {
+        app.logout();
+        try {
+            MapaDemoApp.setRoot(javafx.fxml.FXMLLoader.load(getClass().getResource("/FXMLFiles/FXMLAuthentificator.fxml")));
+        } catch (IOException ex) {
+            showInfo("No se pudo volver al login.");
+        }
     }
 
     @FXML
-    private void cambiaMenuModPerfil(ActionEvent event) {
+    private void cambiaMenuModPerfil(javafx.event.ActionEvent event) {
         cambioPestaña.set(2);
+        loadProfileData();
     }
 
     @FXML
-    private void cambiaHistorialSesion(ActionEvent event) {
+    private void cambiaHistorialSesion(javafx.event.ActionEvent event) {
         cambioPestaña.set(3);
+        showSessionSummary();
     }
 
+    @FXML
+    private void importarActividad(javafx.event.ActionEvent event) {
+        FileChooser fc = new FileChooser();
+        fc.setInitialDirectory(new File("."));
+        fc.getExtensionFilters().add(new ExtensionFilter("Ficheros GPX", "*.gpx"));
+        File gpx = fc.showOpenDialog(zoom_slider.getScene().getWindow());
+        if (gpx == null) {
+            return;
+        }
+        Activity act = app.importActivity(gpx);
+        if (act != null) {
+            loadActivities();
+            map_listview.getSelectionModel().select(act);
+            renderActivity(act);
+        } else {
+            showInfo("No se pudo importar la actividad.");
+        }
+    }
 
+    @FXML
+    private void borrarActividadSeleccionada(javafx.event.ActionEvent event) {
+        Activity sel = map_listview.getSelectionModel().getSelectedItem();
+        if (sel == null) {
+            return;
+        }
+        app.removeActivity(sel);
+        loadActivities();
+        currentActivity = null;
+    }
 
+    @FXML
+    private void verAcumulado(javafx.event.ActionEvent event) {
+        List<Activity> acts = app.getUserActivities();
+        double dist = 0;
+        double gain = 0;
+        double loss = 0;
+        Duration total = Duration.ZERO;
+        for (Activity a : acts) {
+            dist += a.getTotalDistance();
+            gain += a.getElevationGain();
+            loss += a.getElevationLoss();
+            total = total.plus(a.getDuration());
+        }
+        showInfo(String.format("Actividades: %d\nDistancia: %.2f km\nTiempo: %s\nDesnivel+: %.0f m\nDesnivel-: %.0f m",
+                acts.size(), dist / 1000.0, total, gain, loss));
+    }
+
+    @FXML
+    private void borrarMapa(javafx.event.ActionEvent event) {
+        MapRegion selected = mapRegionsList.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showInfo("Selecciona un mapa de la lista para borrarlo.");
+            return;
+        }
+        List<MapRegion> unused = app.getUnusedMapRegions();
+        if (unused.stream().noneMatch(m -> m.getName().equals(selected.getName()))) {
+            showInfo("Ese mapa está siendo usado por alguna actividad y no se puede borrar.");
+            return;
+        }
+        if (app.removeMapRegion(selected)) {
+            showInfo("Mapa eliminado.");
+            loadMapRegions();
+        } else {
+            showInfo("No se pudo borrar el mapa.");
+        }
+    }
+
+    private void loadActivities() {
+        List<Activity> activities = app.getUserActivities();
+        map_listview.getItems().setAll(activities);
+        if (!activities.isEmpty()) {
+            renderActivity(activities.get(0));
+            map_listview.getSelectionModel().select(0);
+        }
+    }
+
+    private void renderActivity(Activity activity) {
+        currentActivity = activity;
+        if (activity == null) {
+            return;
+        }
+        MapRegion region = activity.getSuggestedMap();
+        if (region == null) {
+            region = app.findMapForActivity(activity);
+        }
+        if (region == null) {
+            showInfo("No se encontró mapa para la actividad.");
+            return;
+        }
+        buildMap(new File(region.getImagePath()), region);
+        drawRoute(activity);
+        drawAnnotations(activity);
+        centerOnActivityStart(activity);
+        showActivitySummary(activity);
+    }
+
+    private void drawRoute(Activity activity) {
+        if (projection == null || mapPane == null) {
+            return;
+        }
+        List<TrackPoint> points = activity.getTrackPoints();
+        for (int i = 1; i < points.size(); i++) {
+            TrackPoint p1 = points.get(i - 1);
+            TrackPoint p2 = points.get(i);
+            Point2D xy1 = projection.project(p1);
+            Point2D xy2 = projection.project(p2);
+            Line segment = new Line(xy1.getX(), xy1.getY(), xy2.getX(), xy2.getY());
+            segment.setStrokeWidth(2.5);
+            segment.setStroke(colorForSpeed(p1.speedTo(p2)));
+            mapPane.getChildren().add(segment);
+        }
+        if (activity.getStartPoint() != null) {
+            Point2D start = projection.project(activity.getStartPoint());
+            Circle c = new Circle(start.getX(), start.getY(), 5, Color.GREEN);
+            mapPane.getChildren().add(c);
+        }
+        if (activity.getEndPoint() != null) {
+            Point2D end = projection.project(activity.getEndPoint());
+            Circle c = new Circle(end.getX(), end.getY(), 5, Color.RED);
+            mapPane.getChildren().add(c);
+        }
+    }
+
+    private Color colorForSpeed(double speedKmh) {
+        if (Double.isNaN(speedKmh) || speedKmh <= 0) {
+            return Color.GRAY;
+        }
+        if (speedKmh < 7) {
+            return Color.DARKBLUE;
+        }
+        if (speedKmh < 10) {
+            return Color.DODGERBLUE;
+        }
+        if (speedKmh < 13) {
+            return Color.GOLDENROD;
+        }
+        return Color.CRIMSON;
+    }
+
+    private void drawAnnotations(Activity activity) {
+        for (Annotation ann : activity.getAnnotations()) {
+            List<GeoPoint> geoPoints = ann.getGeoPoints();
+            if (geoPoints.isEmpty()) {
+                continue;
+            }
+            Color color = Color.web(ann.getColor() == null ? "#E74C3C" : ann.getColor());
+            if (ann.getType() == AnnotationType.POINT) {
+                Point2D p = projection.project(geoPoints.get(0));
+                Circle c = new Circle(p.getX(), p.getY(), 6, color);
+                mapPane.getChildren().add(c);
+                if (ann.getText() != null && !ann.getText().isBlank()) {
+                    Text t = new Text(p.getX() + 8, p.getY() - 8, ann.getText());
+                    mapPane.getChildren().add(t);
+                }
+            } else if (ann.getType() == AnnotationType.TEXT) {
+                Point2D p = projection.project(geoPoints.get(0));
+                Text t = new Text(p.getX(), p.getY(), ann.getText());
+                t.setFill(color);
+                mapPane.getChildren().add(t);
+            } else if (ann.getType() == AnnotationType.LINE && geoPoints.size() >= 2) {
+                Point2D p1 = projection.project(geoPoints.get(0));
+                Point2D p2 = projection.project(geoPoints.get(1));
+                Line line = new Line(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+                line.setStroke(color);
+                line.setStrokeWidth(Math.max(1.0, ann.getStrokeWidth()));
+                mapPane.getChildren().add(line);
+            } else if (ann.getType() == AnnotationType.CIRCLE && geoPoints.size() >= 2) {
+                Point2D c = projection.project(geoPoints.get(0));
+                Point2D b = projection.project(geoPoints.get(1));
+                Circle circle = new Circle(c.getX(), c.getY(), c.distance(b));
+                circle.setStroke(color);
+                circle.setFill(Color.TRANSPARENT);
+                circle.setStrokeWidth(Math.max(1.0, ann.getStrokeWidth()));
+                mapPane.getChildren().add(circle);
+            }
+        }
+    }
+
+    private void centerOnActivityStart(Activity activity) {
+        TrackPoint start = activity.getStartPoint();
+        if (start == null || mapPane == null || zoomGroup == null) {
+            return;
+        }
+        Point2D startPoint = projection.project(start);
+        double mapWidth = mapPane.getWidth() * zoomGroup.getScaleX();
+        double mapHeight = mapPane.getHeight() * zoomGroup.getScaleY();
+        double poiX = startPoint.getX() * zoomGroup.getScaleX();
+        double poiY = startPoint.getY() * zoomGroup.getScaleY();
+        double viewW = map_scrollpane.getViewportBounds().getWidth();
+        double viewH = map_scrollpane.getViewportBounds().getHeight();
+        double scrollH = (poiX - viewW / 2) / Math.max(1.0, (mapWidth - viewW));
+        double scrollV = (poiY - viewH / 2) / Math.max(1.0, (mapHeight - viewH));
+        scrollH = Math.max(0, Math.min(1, scrollH));
+        scrollV = Math.max(0, Math.min(1, scrollV));
+        Timeline timeline = new Timeline(
+                new KeyFrame(javafx.util.Duration.millis(300),
+                        new KeyValue(map_scrollpane.hvalueProperty(), scrollH),
+                        new KeyValue(map_scrollpane.vvalueProperty(), scrollV))
+        );
+        timeline.play();
+    }
+
+    private void addAnnotationFromClick(AnnotationType type, double x, double y) {
+        GeoPoint point = projection.unproject(x, y);
+        Dialog<AnnotationDraft> dialog = new Dialog<>();
+        dialog.setTitle("Nueva anotación");
+        ButtonType okButton = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okButton, ButtonType.CANCEL);
+        TextField textField = new TextField();
+        textField.setPromptText("Texto (opcional)");
+        ColorPicker colorPicker = new ColorPicker(Color.CRIMSON);
+        dialog.getDialogPane().setContent(new VBox(8, new Label("Texto"), textField, new Label("Color"), colorPicker));
+        dialog.setResultConverter(bt -> bt == okButton ? new AnnotationDraft(textField.getText(), toHex(colorPicker.getValue())) : null);
+        Optional<AnnotationDraft> result = dialog.showAndWait();
+        result.ifPresent(draft -> saveAnnotation(type, draft.text(), draft.color(), List.of(point)));
+    }
+
+    private void startTwoPointAnnotation(AnnotationType type, double x, double y) {
+        Dialog<AnnotationDraft> dialog = new Dialog<>();
+        dialog.setTitle("Nueva anotación");
+        ButtonType okButton = new ButtonType("Continuar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okButton, ButtonType.CANCEL);
+        TextField textField = new TextField();
+        textField.setPromptText("Texto (opcional)");
+        ColorPicker colorPicker = new ColorPicker(Color.CRIMSON);
+        dialog.getDialogPane().setContent(new VBox(8, new Label("Texto"), textField, new Label("Color"), colorPicker));
+        dialog.setResultConverter(bt -> bt == okButton ? new AnnotationDraft(textField.getText(), toHex(colorPicker.getValue())) : null);
+        Optional<AnnotationDraft> draft = dialog.showAndWait();
+        if (draft.isEmpty()) {
+            return;
+        }
+        pendingType = type;
+        pendingFirstPoint = projection.unproject(x, y);
+        pendingText = draft.get().text();
+        pendingColor = draft.get().color();
+        mapPane.setStyle("-fx-cursor: crosshair;");
+        showInfo("Haz clic izquierdo para marcar el segundo punto de la anotación.");
+    }
+
+    private void saveAnnotation(AnnotationType type, String text, String color, List<GeoPoint> points) {
+        if (currentActivity == null) {
+            return;
+        }
+        Annotation ann = new Annotation(type, text, color, 2.0, points);
+        Annotation saved = app.addAnnotation(currentActivity, ann);
+        if (saved != null) {
+            renderActivity(currentActivity);
+        }
+    }
+
+    private void loadProfileData() {
+        User current = app.getCurrentUser();
+        if (current == null) {
+            return;
+        }
+        txtEmail.setText(current.getEmail());
+        dpFecha.setValue(current.getBirthDate());
+        txtPassword.clear();
+        avatarPath = current.getAvatarPath();
+    }
+
+    private void showSessionSummary() {
+        User current = app.getCurrentUser();
+        if (current == null) {
+            return;
+        }
+        List<Session> sessions = app.getSessionsByUser(current);
+        int imported = 0;
+        int viewed = 0;
+        int annotations = 0;
+        Duration total = Duration.ZERO;
+        for (Session s : sessions) {
+            imported += s.getImportedActivities();
+            viewed += s.getViewedActivities();
+            annotations += s.getAnnotationsCreated();
+            total = total.plus(s.getDuration());
+        }
+        showInfo(String.format("Sesiones: %d\nDuración total: %s\nActividades importadas: %d\nActividades visualizadas: %d\nAnotaciones creadas: %d",
+                sessions.size(), total, imported, viewed, annotations));
+    }
+
+    private void showActivitySummary(Activity activity) {
+        showInfo(String.format(
+                "Actividad: %s\nDistancia: %.2f km\nDuración: %s\nVelocidad media: %.2f km/h\nRitmo medio: %.2f min/km\nDesnivel+: %.0f m\nDesnivel-: %.0f m\nAltitud min/máx: %.0f / %.0f m",
+                activity.getName(),
+                activity.getTotalDistance() / 1000.0,
+                activity.getDuration(),
+                activity.getAverageSpeed(),
+                activity.getAveragePace(),
+                activity.getElevationGain(),
+                activity.getElevationLoss(),
+                activity.getMinElevation(),
+                activity.getMaxElevation()
+        ));
+    }
+
+    private void loadMapRegions() {
+        mapRegionsList.getItems().setAll(app.getMapRegions());
+    }
+
+    private void showElevationProfile(Activity activity) {
+        if (activity == null || activity.getTrackPoints().isEmpty()) {
+            return;
+        }
+        NumberAxis xAxis = new NumberAxis();
+        NumberAxis yAxis = new NumberAxis();
+        xAxis.setLabel("Distancia (km)");
+        yAxis.setLabel("Altitud (m)");
+        LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
+        chart.setCreateSymbols(false);
+        chart.setLegendVisible(false);
+        chart.setTitle("Perfil de desnivel - " + activity.getName());
+
+        XYChart.Series<Number, Number> series = new XYChart.Series<>();
+        List<TrackPoint> points = activity.getTrackPoints();
+        double accMeters = 0;
+        for (int i = 0; i < points.size(); i++) {
+            if (i > 0) {
+                accMeters += points.get(i - 1).distanceTo(points.get(i));
+            }
+            series.getData().add(new XYChart.Data<>(accMeters / 1000.0, points.get(i).getElevation()));
+        }
+        chart.getData().add(series);
+
+        hoverPointMarker = new Circle(6, Color.ORANGE);
+        hoverPointMarker.setVisible(false);
+        if (mapPane != null) {
+            mapPane.getChildren().add(hoverPointMarker);
+        }
+
+        chart.setOnMouseMoved(e -> {
+            if (projection == null || mapPane == null) {
+                return;
+            }
+            double xValue = xAxis.getValueForDisplay(e.getX()).doubleValue();
+            int idx = nearestTrackPointIndex(points, xValue);
+            if (idx < 0) {
+                return;
+            }
+            Point2D projected = projection.project(points.get(idx));
+            hoverPointMarker.setCenterX(projected.getX());
+            hoverPointMarker.setCenterY(projected.getY());
+            hoverPointMarker.setVisible(true);
+        });
+        chart.setOnMouseExited(e -> {
+            if (hoverPointMarker != null) {
+                hoverPointMarker.setVisible(false);
+            }
+        });
+
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Perfil de desnivel");
+        dialog.getDialogPane().setPrefSize(900, 600);
+        dialog.getDialogPane().setContent(chart);
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        dialog.showAndWait();
+    }
+
+    private int nearestTrackPointIndex(List<TrackPoint> points, double km) {
+        double accMeters = 0;
+        int bestIndex = -1;
+        double bestDist = Double.MAX_VALUE;
+        for (int i = 0; i < points.size(); i++) {
+            if (i > 0) {
+                accMeters += points.get(i - 1).distanceTo(points.get(i));
+            }
+            double d = Math.abs((accMeters / 1000.0) - km);
+            if (d < bestDist) {
+                bestDist = d;
+                bestIndex = i;
+            }
+        }
+        return bestIndex;
+    }
+
+    private String toHex(Color c) {
+        int r = (int) Math.round(c.getRed() * 255);
+        int g = (int) Math.round(c.getGreen() * 255);
+        int b = (int) Math.round(c.getBlue() * 255);
+        return String.format("#%02X%02X%02X", r, g, b);
+    }
+
+    private static class AnnotationDraft {
+        private final String text;
+        private final String color;
+
+        AnnotationDraft(String text, String color) {
+            this.text = text;
+            this.color = color;
+        }
+
+        String text() {
+            return text;
+        }
+
+        String color() {
+            return color;
+        }
+    }
+
+    private boolean isDouble(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            Double.parseDouble(value.trim());
+            return true;
+        } catch (NumberFormatException ex) {
+            return false;
+        }
+    }
+
+    private void showInfo(String msg) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+        alert.showAndWait();
+    }
 }
