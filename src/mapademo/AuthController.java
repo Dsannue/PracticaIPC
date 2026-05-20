@@ -228,7 +228,7 @@ public class AuthController {
         if (pass == null) {
             return false;
         }
-        return pass.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%&*()\\-+=]).{8,20}$");
+        return pass.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%&*()_\\-+=]).{8,20}$");
     }
 
     @FXML
