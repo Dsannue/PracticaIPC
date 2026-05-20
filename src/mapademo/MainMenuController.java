@@ -1142,7 +1142,7 @@ public class MainMenuController implements Initializable {
         if (mapPane != null) {
             mapPane.getChildren().add(hoverPointMarker);
         }
-
+//aqui esta la tabla
         chart.setOnMouseMoved(e -> {
             if (projection == null || mapPane == null) {
                 return;
