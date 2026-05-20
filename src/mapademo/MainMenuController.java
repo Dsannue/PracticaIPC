@@ -1,4 +1,3 @@
-
 package mapademo;
 
 import java.io.File;
@@ -62,6 +61,11 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import javafx.stage.Modality;
+import javafx.stage.StageStyle;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import upv.ipc.sportlib.Activity;
 import upv.ipc.sportlib.Annotation;
 import upv.ipc.sportlib.AnnotationType;
@@ -72,7 +76,6 @@ import upv.ipc.sportlib.Session;
 import upv.ipc.sportlib.SportActivityApp;
 import upv.ipc.sportlib.TrackPoint;
 import upv.ipc.sportlib.User;
-
 
 public class MainMenuController implements Initializable {
 
@@ -246,15 +249,12 @@ public class MainMenuController implements Initializable {
     }
 
     @FXML
-    void listClicked(MouseEvent event) {
+   void listClicked(MouseEvent event) {
         Activity selected = map_listview.getSelectionModel().getSelectedItem();
         if (selected == null) {
             return;
         }
         renderActivity(selected);
-        if (event.getClickCount() >= 2) {
-            showElevationProfile(selected);
-        }
     }
 
     private void buildMap(File imageFile, MapRegion region) {
@@ -607,19 +607,51 @@ public class MainMenuController implements Initializable {
         btnMapChanger.setDisable(false);
     }
 
+    private boolean confirmAction(String fxmlPath) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent root = loader.load();
+
+            Button btnAceptar = (Button) root.lookup("#btnAceptar");
+            Button btnCancelar = (Button) root.lookup("#btnCancelar");
+
+            Stage stage = new Stage();
+            stage.initOwner(zoom_slider.getScene().getWindow());
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.TRANSPARENT);
+
+            Scene scene = new Scene(root);
+            scene.setFill(Color.TRANSPARENT);
+            stage.setScene(scene);
+
+            final boolean[] result = {false};
+
+            if (btnAceptar != null) {
+                btnAceptar.setOnAction(e -> {
+                    result[0] = true;
+                    stage.close();
+                });
+            }
+
+            if (btnCancelar != null) {
+                btnCancelar.setOnAction(e -> {
+                    result[0] = false;
+                    stage.close();
+                });
+            }
+
+            stage.showAndWait();
+            return result[0];
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
     @FXML
     private void logout(javafx.event.ActionEvent event) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        Stage dialogStage = (Stage) alert.getDialogPane().getScene().getWindow();
-        if (getClass().getResource("/resources/logoDef.png") != null) {
-            dialogStage.getIcons().add(new Image(getClass().getResourceAsStream("/resources/logoDef.png")));
-        }
-        alert.setTitle("Cerrar Sesión");
-        alert.setHeaderText("¿Estás seguro de que quieres cerrar la sesión?");
-        alert.setContentText("Cualquier cambio sin guardar se perderá.");
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
+        boolean ok = confirmAction("/FXMLFiles/FXMLDoubleCheckLogOut.fxml");
+        if (ok) {
             app.logout();
             try {
                 MapaDemoApp.setRoot(javafx.fxml.FXMLLoader.load(getClass().getResource("/FXMLFiles/FXMLAuthentificator.fxml")));
@@ -666,17 +698,8 @@ public class MainMenuController implements Initializable {
         if (sel == null) {
             return;
         }
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        Stage dialogStage = (Stage) alert.getDialogPane().getScene().getWindow();
-        if (getClass().getResource("/resources/logoDef.png") != null) {
-            dialogStage.getIcons().add(new Image(getClass().getResourceAsStream("/resources/logoDef.png")));
-        }
-        alert.setTitle("Borrar Actividad");
-        alert.setHeaderText("¿Estás seguro de que quieres borrar esta actividad?");
-        alert.setContentText("Esta acción es permanente y no se puede deshacer.");
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
+        boolean ok = confirmAction("/FXMLFiles/FXMLDoubleCheckDelete.fxml");
+        if (ok) {
             app.removeActivity(sel);
             ocultarGrafica(null);
             loadActivities();
@@ -731,18 +754,50 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    private void showMapPlaceholder() {
+        VBox placeholder = new VBox();
+        placeholder.setAlignment(Pos.CENTER);
+        placeholder.setSpacing(18);
+        placeholder.setPadding(new Insets(40));
+        placeholder.setStyle("-fx-background-color: #f8fafc;");
+
+        Label mapIcon = new Label("🗺️");
+        mapIcon.setFont(Font.font("System", 64));
+
+        Label title = new Label("Carga un mapa para empezar");
+        title.setFont(Font.font("System", FontWeight.BOLD, 22));
+        title.setTextFill(Color.web("#0f172a"));
+
+        Label desc = new Label("Selecciona un mapa disponible en la lista o añade uno nuevo para visualizar tu actividad.");
+        desc.setFont(Font.font("System", 14));
+        desc.setTextFill(Color.web("#64748b"));
+        desc.setWrapText(true);
+        desc.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+        desc.setMaxWidth(420);
+
+        Button btnGoToMapManager = new Button("Ir a Gestor de Mapas");
+        btnGoToMapManager.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand;");
+        btnGoToMapManager.setOnAction(e -> cambiarMapa(null));
+
+        placeholder.getChildren().addAll(mapIcon, title, desc, btnGoToMapManager);
+
+        map_scrollpane.setContent(placeholder);
+
+        placeholder.prefWidthProperty().bind(Bindings.createDoubleBinding(
+            () -> Math.max(800.0, map_scrollpane.getViewportBounds().getWidth() - 2),
+            map_scrollpane.viewportBoundsProperty()
+        ));
+        placeholder.prefHeightProperty().bind(Bindings.createDoubleBinding(
+            () -> Math.max(600.0, map_scrollpane.getViewportBounds().getHeight() - 2),
+            map_scrollpane.viewportBoundsProperty()
+        ));
+    }
+
     private void renderActivity(Activity activity) {
         currentActivity = activity;
-        if (activity == null) {
-            try {
-                Pane placeholder = new Pane();
-                ImageView iv = new ImageView(new Image(getClass().getResourceAsStream("/resources/logoDef.png")));
-                iv.setPickOnBounds(true);
-                placeholder.getChildren().add(iv);
-                map_scrollpane.setContent(placeholder);
-            } catch (Exception ex) {
-                map_scrollpane.setContent(null);
-            }
+       if (activity == null) {
+            ocultarGrafica(null);
+            showMapPlaceholder();
             zoomGroup = null;
             mapPane = null;
             projection = null;
@@ -755,13 +810,15 @@ public class MainMenuController implements Initializable {
         }
         if (region == null) {
             showInfo("No se encontró mapa para la actividad.");
+            showMapPlaceholder();
             return;
         }
         buildMap(new File(region.getImagePath()), region);
-        drawRoute(activity);
-        drawAnnotations(activity);
+       drawAnnotations(activity);
         centerOnActivityStart(activity);
         populateDetailView(activity);
+        showElevationProfile(activity);
+        
     }
 
     private void drawRoute(Activity activity) {
@@ -1090,7 +1147,8 @@ public class MainMenuController implements Initializable {
             if (projection == null || mapPane == null) {
                 return;
             }
-            double xValue = xAxis.getValueForDisplay(e.getX()).doubleValue();
+            Point2D axisPoint = xAxis.sceneToLocal(e.getSceneX(), e.getSceneY());
+            double xValue = xAxis.getValueForDisplay(axisPoint.getX()).doubleValue();
             int idx = nearestTrackPointIndex(points, xValue);
             if (idx < 0) {
                 return;

@@ -32,8 +32,8 @@
       
       <HBox spacing="15.0">
          <children>
-            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="45.0" style="-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="CANCELAR" HBox.hgrow="ALWAYS" />
-            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="45.0" style="-fx-background-color: #ff4b2b; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;" text="CERRAR" HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnCancelar" id="btnCancelar" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="45.0" style="-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="CANCELAR" HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnAceptar" id="btnAceptar" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="45.0" style="-fx-background-color: #ff4b2b; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;" text="CERRAR" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
       
