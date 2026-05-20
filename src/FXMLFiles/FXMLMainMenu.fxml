@@ -59,7 +59,7 @@
                                  <Label text="Desnivel: +150m" textFill="#ff4b2b" />
                               </children>
                            </VBox>
-                           <Button fx:id="btnBorrarActividad" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="40.0" style="-fx-background-color: #ffe4e6; -fx-text-fill: #e11d48; -fx-font-weight: bold; -fx-background-radius: 8;" text="Borrar Actividad" />
+                           <Button fx:id="btnBorrarActividad" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#borrarActividadSeleccionada" prefHeight="40.0" style="-fx-background-color: #ffe4e6; -fx-text-fill: #e11d48; -fx-font-weight: bold; -fx-background-radius: 8;" text="Borrar Actividad" />
                         </children>
                      </VBox>
 
@@ -68,7 +68,7 @@
                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                         </padding>
                         <children>
-                           <Button fx:id="btnActAcumulation" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-color: #f8fafc; -fx-border-color: #2196F3; -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #2196F3; -fx-font-weight: bold;" text="Ver Acumulado Global" />
+                           <Button fx:id="btnActAcumulation" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#verAcumulado" prefHeight="35.0" style="-fx-background-color: #f8fafc; -fx-border-color: #2196F3; -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #2196F3; -fx-font-weight: bold;" text="Ver Acumulado Global" />
                            <HBox alignment="CENTER_LEFT">
                               <children>
                                  <Label text="MIS RUTAS" textFill="#94a3b8">
@@ -81,7 +81,7 @@
                               </children>
                            </HBox>
                            <ListView fx:id="map_listview" editable="true" onMouseClicked="#listClicked" style="-fx-background-insets: 0; -fx-padding: 0;" VBox.vgrow="ALWAYS" />
-                           <Button fx:id="btnAddActivity" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="40.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;" text="+ Añadir Actividad" />
+                           <Button fx:id="btnAddActivity" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#importarActividad" prefHeight="40.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;" text="+ Añadir Actividad" />
                         </children>
                      </VBox>
                   </children>
@@ -93,7 +93,7 @@
                         <children>
                            <ImageView pickOnBounds="true">
                               <image>
-                                 <Image url="@../resources/upv.jpg" />
+                                 <Image url="@../resources/logoDef.png" />
                               </image>
                            </ImageView>
                         </children>
@@ -102,7 +102,7 @@
                </ScrollPane>
             </items>
          </SplitPane>
-         <VBox prefHeight="200.0" prefWidth="100.0">
+         <VBox fx:id="menuGestionMapas" prefHeight="200.0" prefWidth="100.0">
             <children>
                <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="1024.0" style="-fx-background-color: white; -fx-border-color: #e2e8f0;">
                   <padding>
@@ -128,7 +128,7 @@
                                  <Insets left="10.0" top="10.0" />
                               </VBox.margin>
                            </Label>
-                           <ListView prefHeight="551.0" prefWidth="400.0" style="-fx-background-insets: 0; -fx-padding: 0;" VBox.vgrow="ALWAYS">
+                           <ListView fx:id="mapRegionsList" prefHeight="551.0" prefWidth="400.0" style="-fx-background-insets: 0; -fx-padding: 0;" VBox.vgrow="ALWAYS">
                               <VBox.margin>
                                  <Insets left="10.0" right="10.0" />
                               </VBox.margin>
@@ -168,7 +168,7 @@
                                              <Font name="System Bold" size="13.0" />
                                           </font>
                                        </Label>
-                                       <TextField maxWidth="400.0" prefHeight="38.0" prefWidth="400.0" promptText="Ej: Castellon de la Plana" style="-fx-background-radius: 10; -fx-border-radius: 10;" />
+                                       <TextField fx:id="txtNombreRegion" maxWidth="400.0" prefHeight="38.0" prefWidth="400.0" promptText="Ej: Castellon de la Plana" style="-fx-background-radius: 10; -fx-border-radius: 10;" />
                                     </children>
                                  </VBox>
                                  <VBox alignment="CENTER" prefHeight="151.0" prefWidth="1024.0" spacing="10.0">
@@ -321,7 +321,7 @@
                                     <children>
                                        <Circle fill="#f8fafc" radius="63.0" stroke="#e2e8f0" strokeType="INSIDE" />
                                        <ImageView fitHeight="90.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true">
-                                          <image><Image url="@../resources/logo.png" /></image>
+                                          <image><Image url="@../resources/logoDef.png" /></image>
                                        </ImageView>
                                     </children>
                                  </StackPane>
@@ -486,7 +486,7 @@
                </items>
                <graphic>
                   <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                     <image><Image url="@../resources/logo.png" /></image>
+                     <image><Image url="@../resources/logoDef.png" /></image>
                   </ImageView>
                </graphic>
             </MenuButton>
