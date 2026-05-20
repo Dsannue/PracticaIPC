@@ -177,6 +177,10 @@ public class MainMenuController implements Initializable {
     private VBox vboxRecentSessions;
     @FXML
     private Button btnVolverDesdeHistorial;
+    @FXML
+    private ImageView imgAvatarMod;
+    @FXML
+    private ImageView imgAvatarTop;
     
     private IntegerProperty cambioPestaña;
     private BooleanProperty modEmailValid;
@@ -483,6 +487,9 @@ public class MainMenuController implements Initializable {
         File imgFile = fc.showOpenDialog(zoom_slider.getScene().getWindow());
         if (imgFile != null) {
             avatarPath = imgFile.getAbsolutePath();
+            if (imgAvatarMod != null) {
+                imgAvatarMod.setImage(new Image(imgFile.toURI().toString()));
+            }
         }
     }
 
@@ -920,6 +927,16 @@ public class MainMenuController implements Initializable {
         dpFecha.setValue(current.getBirthDate());
         txtPassword.clear();
         avatarPath = current.getAvatarPath();
+
+        Image avatar = current.getAvatar();
+        if (avatar != null) {
+            if (imgAvatarMod != null) imgAvatarMod.setImage(avatar);
+            if (imgAvatarTop != null) imgAvatarTop.setImage(avatar);
+        } else {
+            Image defaultImg = new Image(getClass().getResourceAsStream("/resources/logoDef.png"));
+            if (imgAvatarMod != null) imgAvatarMod.setImage(defaultImg);
+            if (imgAvatarTop != null) imgAvatarTop.setImage(defaultImg);
+        }
 
         if (lblErrEmailMod != null) lblErrEmailMod.setVisible(false);
         if (lblErrPassMod != null) lblErrPassMod.setVisible(false);

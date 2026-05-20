@@ -341,7 +341,7 @@
                                  <StackPane maxWidth="-Infinity" prefHeight="70.0" prefWidth="90.0">
                                     <children>
                                        <Circle fill="#f8fafc" radius="63.0" stroke="#e2e8f0" strokeType="INSIDE" />
-                                       <ImageView fitHeight="90.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true">
+                                       <ImageView fx:id="imgAvatarMod" fitHeight="90.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true">
                                           <image><Image url="@../resources/logoDef.png" /></image>
                                        </ImageView>
                                     </children>
@@ -509,7 +509,7 @@
                   <MenuItem fx:id="btnLogOut" mnemonicParsing="false" onAction="#logout" text="Cerrar Sesión" />
                </items>
                <graphic>
-                  <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="imgAvatarTop" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                      <image><Image url="@../resources/logoDef.png" /></image>
                   </ImageView>
                </graphic>
