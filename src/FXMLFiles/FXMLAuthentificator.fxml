@@ -21,7 +21,7 @@
          <children>
             <ImageView fitHeight="720.0" fitWidth="640.0" opacity="0.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../resources/logo.png" />
+                  <Image url="@../resources/logoDef.png" />
                </image>
             </ImageView>
             <Pane opacity="0.4" style="-fx-background-color: linear-gradient(to right, rgba(15, 23, 42, 0.8), transparent);" />
@@ -33,7 +33,7 @@
                <children>
                   <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../resources/logo_blanco.png" />
+                        <Image url="@../resources/logoDef.png" />
                      </image>
                   </ImageView>
                   <Label text="Running la Safor" textFill="WHITE">
@@ -59,7 +59,7 @@
                <children>
                   <ImageView fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../resources/logo.png" />
+                        <Image url="@../resources/logoDef.png" />
                      </image>
                   </ImageView>
                   <VBox spacing="5.0">
@@ -196,7 +196,7 @@
                   </VBox>
                   <VBox spacing="15.0">
                      <children>
-                        <Button fx:id="btnReg" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="40.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 30; -fx-cursor: hand;" text="Registrarse">
+                        <Button fx:id="btnReg" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#registrarUsuario" prefHeight="40.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 30; -fx-cursor: hand;" text="Registrarse">
                            <font>
                               <Font size="16.0" />
                            </font>
