@@ -30,7 +30,7 @@
                   <Circle fill="#f8fafc" radius="60.0" stroke="#e2e8f0" strokeType="INSIDE" />
                   <ImageView fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../resources/logo.png" />
+                        <Image url="@../resources/logoDef.png" />
                      </image>
                   </ImageView>
                </children>
