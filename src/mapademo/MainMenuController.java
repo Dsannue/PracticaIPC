@@ -816,6 +816,7 @@ public class MainMenuController implements Initializable {
         buildMap(new File(region.getImagePath()), region);
        drawAnnotations(activity);
         centerOnActivityStart(activity);
+        drawRoute(activity);
         populateDetailView(activity);
         showElevationProfile(activity);
         
