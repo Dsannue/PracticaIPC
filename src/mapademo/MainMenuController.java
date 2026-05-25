@@ -224,18 +224,28 @@ public class MainMenuController implements Initializable {
     @FXML
     private MenuItem btnHistorialSesion;
     
+    /**
+     * Aumenta el nivel de zoom del mapa al pulsar el botón "+".
+     */
     @FXML
     void zoomIn(javafx.event.ActionEvent event) {
         double sliderVal = zoom_slider.getValue();
         zoom_slider.setValue(sliderVal + 0.1);
     }
-
+    
+    /**
+     * Reduce el nivel de zoom del mapa al pulsar el botón "-".
+     */
     @FXML
     void zoomOut(javafx.event.ActionEvent event) {
         double sliderVal = zoom_slider.getValue();
         zoom_slider.setValue(sliderVal - 0.1);
     }
-
+    
+    /**
+     * Aplica la escala visual al contenedor del mapa manteniendo la posición de scroll actual.
+     * Este método es llamado cuando cambia el valor del Slider de zoom.
+     */
     private void zoom(double scaleValue) {
         if (zoomGroup == null) {
             return;
@@ -248,8 +258,12 @@ public class MainMenuController implements Initializable {
         map_scrollpane.setVvalue(scrollV);
     }
 
+    /**
+     * Se ejecuta cuando el usuario hace clic en una actividad de la lista de rutas.
+     * Carga y muestra los detalles y el mapa de la actividad seleccionada.
+     */
     @FXML
-   void listClicked(MouseEvent event) {
+    void listClicked(MouseEvent event) {
         Activity selected = map_listview.getSelectionModel().getSelectedItem();
         if (selected == null) {
             return;
@@ -257,6 +271,11 @@ public class MainMenuController implements Initializable {
         renderActivity(selected);
     }
 
+    /**
+     * Construye y carga la imagen del mapa en el panel visual.
+     * También configura las interacciones del ratón sobre el mapa (clics derechos e izquierdos)
+     * para la creación de anotaciones.
+     */
     private void buildMap(File imageFile, MapRegion region) {
         if (imageFile == null || !imageFile.exists()) {
             map_scrollpane.setContent(new Label("Imagen no encontrada: " + (imageFile == null ? "-" : imageFile.getPath())));
@@ -297,6 +316,10 @@ public class MainMenuController implements Initializable {
         map_scrollpane.setContent(contentGroup);
     }
 
+    /**
+     * Despliega un menú contextual al hacer clic derecho en el mapa, 
+     * permitiendo al usuario elegir qué tipo de anotación desea añadir.
+     */
     private void onMapRightClick(double x, double y) {
         if (currentActivity == null || projection == null) {
             showInfo("Selecciona una actividad para añadir anotaciones.");
@@ -451,11 +474,18 @@ public class MainMenuController implements Initializable {
         loadMapRegions();
     }
 
+    /**
+     * Captura el movimiento del ratón sobre el mapa y actualiza la etiqueta inferior
+     * con las coordenadas visuales X e Y.
+     */
     @FXML
     private void showPosition(MouseEvent event) {
         mousePosition.setText("sceneX: " + (int) event.getSceneX() + ", sceneY: " + (int) event.getSceneY());
     }
 
+    /**
+     * Muestra una ventana de información "Acerca de" de la aplicación al pulsar el botón de Ayuda.
+     */
     @FXML
     private void about(javafx.event.ActionEvent event) {
         Alert mensaje = new Alert(Alert.AlertType.INFORMATION);
@@ -467,6 +497,9 @@ public class MainMenuController implements Initializable {
         mensaje.showAndWait();
     }
 
+    /**
+     * Cambia la vista principal para mostrar el panel de gestión de mapas.
+     */
     @FXML
     private void cambiarMapa(javafx.event.ActionEvent event) {
         cambioPestaña.set(1);
@@ -474,11 +507,18 @@ public class MainMenuController implements Initializable {
         loadMapRegions();
     }
 
+    /**
+     * Restaura la vista principal (el mapa) ocultando la vista del perfil de usuario.
+     */
     @FXML
     private void volverDesdePerfilAlMapa(javafx.event.ActionEvent event) {
         cambioPestaña.set(0);
     }
 
+    /**
+     * Abre un selector de archivos (FileChooser) para permitir al usuario
+     * elegir una nueva foto de avatar y previsualizarla en el formulario.
+     */
     @FXML
     private void cambioAvatar(javafx.event.ActionEvent event) {
         FileChooser fc = new FileChooser();
@@ -493,11 +533,19 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    /**
+     * Cancela los cambios realizados en el formulario de perfil y vuelve a cargar
+     * los datos originales de la base de datos del usuario.
+     */
     @FXML
     private void descartarModPerfil(javafx.event.ActionEvent event) {
         loadProfileData();
     }
 
+    /**
+     * Guarda los cambios introducidos (email, contraseña, fecha, avatar) actualizando
+     * el perfil del usuario actual en el sistema.
+     */
     @FXML
     private void guardarModPerfil(javafx.event.ActionEvent event) {
         User current = app.getCurrentUser();
@@ -518,11 +566,18 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    /**
+     * Oculta el historial de sesiones y devuelve la interfaz a la vista principal del mapa.
+     */
     @FXML
     private void volverDesdeHistorial(javafx.event.ActionEvent event) {
         cambioPestaña.set(0);
     }
 
+    /**
+     * Abre un selector de archivos para que el usuario suba una imagen de mapa local
+     * cuando está intentando añadir un nuevo mapa a la aplicación.
+     */
     @FXML
     private void mapaSeleccionado(javafx.event.ActionEvent event) {
         FileChooser fc = new FileChooser();
@@ -542,6 +597,10 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    /**
+     * Carga y muestra el mapa elegido de la lista de mapas disponibles. Si hay una
+     * actividad activa, redibuja su recorrido sobre el nuevo mapa.
+     */
     @FXML
     private void seleccionarMapaDeLista(javafx.event.ActionEvent event) {
         MapRegion selected = mapRegionsList.getSelectionModel().getSelectedItem();
@@ -558,7 +617,11 @@ public class MainMenuController implements Initializable {
         cambioPestaña.set(0);
         btnMapChanger.setDisable(false);
     }
-
+    
+    /**
+     * Limpia los campos de texto y la selección de archivo del formulario de
+     * añadir nuevo mapa.
+     */
     @FXML
     private void descartarAñadirMapa(javafx.event.ActionEvent event) {
         selectedMapFile = null;
@@ -574,6 +637,10 @@ public class MainMenuController implements Initializable {
         coord4.set(false);
     }
 
+    /**
+     * Crea un nuevo objeto MapRegion en el sistema a partir de la imagen seleccionada
+     * y las 4 coordenadas (Norte, Sur, Este, Oeste) introducidas por el usuario.
+     */
     @FXML
     private void guardarMapa(javafx.event.ActionEvent event) {
         if (selectedMapFile == null) {
@@ -601,12 +668,19 @@ public class MainMenuController implements Initializable {
         cambioPestaña.set(0);
     }
 
+    /**
+     * Cancela la vista de gestión de mapas y devuelve al usuario a la pantalla principal.
+     */
     @FXML
     private void volverDesdeAñadirMapa(javafx.event.ActionEvent event) {
         cambioPestaña.set(0);
         btnMapChanger.setDisable(false);
     }
 
+    /**
+     * Abre una ventana modal de confirmación cargando un archivo FXML (Doble Check).
+     * Retorna true si el usuario pulsa Aceptar, y false si cancela o cierra la ventana.
+     */
     private boolean confirmAction(String fxmlPath) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
@@ -648,6 +722,10 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    /**
+     * Pide confirmación y, si es afirmativa, cierra la sesión del usuario actual
+     * devolviéndolo a la ventana de autenticación inicial.
+     */
     @FXML
     private void logout(javafx.event.ActionEvent event) {
         boolean ok = confirmAction("/FXMLFiles/FXMLDoubleCheckLogOut.fxml");
@@ -661,18 +739,30 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    /**
+     * Cambia la vista a la pestaña de modificación de perfil y carga los datos 
+     * actualizados del usuario.
+     */
     @FXML
     private void cambiaMenuModPerfil(javafx.event.ActionEvent event) {
         cambioPestaña.set(2);
         loadProfileData();
     }
 
+    /**
+     * Cambia la vista a la pestaña del Historial de Sesiones y calcula las
+     * estadísticas para rellenar la interfaz.
+     */
     @FXML
     private void cambiaHistorialSesion(javafx.event.ActionEvent event) {
         cambioPestaña.set(3);
         showSessionSummary();
     }
 
+    /**
+     * Abre un explorador de archivos para importar una ruta desde un archivo .gpx.
+     * Si tiene éxito, recarga la lista de actividades y la muestra.
+     */
     @FXML
     private void importarActividad(javafx.event.ActionEvent event) {
         FileChooser fc = new FileChooser();
@@ -692,6 +782,10 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    /**
+     * Solicita confirmación y elimina permanentemente la actividad que está
+     * actualmente seleccionada en la lista.
+     */
     @FXML
     private void borrarActividadSeleccionada(javafx.event.ActionEvent event) {
         Activity sel = map_listview.getSelectionModel().getSelectedItem();
@@ -706,6 +800,10 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    /**
+     * Calcula los totales globales del usuario (distancia total, tiempo, desniveles)
+     * sumando todas sus actividades y muestra un cuadro de diálogo con el resumen.
+     */
     @FXML
     private void verAcumulado(javafx.event.ActionEvent event) {
         List<Activity> acts = app.getUserActivities();
@@ -723,6 +821,10 @@ public class MainMenuController implements Initializable {
                 acts.size(), dist / 1000.0, total, gain, loss));
     }
 
+    /**
+     * Borra el mapa seleccionado del sistema, siempre y cuando no esté siendo 
+     * usado actualmente por ninguna de las actividades guardadas.
+     */
     @FXML
     private void borrarMapa(javafx.event.ActionEvent event) {
         MapRegion selected = mapRegionsList.getSelectionModel().getSelectedItem();
@@ -743,6 +845,10 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    /**
+     * Recupera todas las actividades del usuario actual, las carga en la lista visual (ListView)
+     * y selecciona la primera automáticamente.
+     */
     private void loadActivities() {
         List<Activity> activities = app.getUserActivities();
         map_listview.getItems().setAll(activities);
@@ -754,6 +860,10 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    /**
+     * Sustituye el mapa por un mensaje visual ("Carga un mapa para empezar") indicando al 
+     * usuario que necesita crear o seleccionar una actividad/mapa. Se usa cuando la app arranca vacía.
+     */
     private void showMapPlaceholder() {
         VBox placeholder = new VBox();
         placeholder.setAlignment(Pos.CENTER);
@@ -793,6 +903,10 @@ public class MainMenuController implements Initializable {
         ));
     }
 
+    /**
+     * Orquesta el renderizado completo de una actividad: busca su mapa correspondiente, 
+     * dibuja la ruta, sus anotaciones, rellena los paneles de detalles y genera la gráfica.
+     */
     private void renderActivity(Activity activity) {
         currentActivity = activity;
        if (activity == null) {
@@ -822,6 +936,10 @@ public class MainMenuController implements Initializable {
         
     }
 
+    /**
+     * Transforma los puntos geográficos de la ruta (TrackPoints) a coordenadas X,Y de pantalla,
+     * dibujando la línea del recorrido y aplicando un color según la velocidad en cada tramo.
+     */
     private void drawRoute(Activity activity) {
         if (projection == null || mapPane == null) {
             return;
@@ -849,6 +967,10 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    /**
+     * Devuelve un objeto Color específico dependiendo de la velocidad indicada (en km/h),
+     * creando así un gradiente de color visual (mapa de calor) para las rutas.
+     */
     private Color colorForSpeed(double speedKmh) {
         if (Double.isNaN(speedKmh) || speedKmh <= 0) {
             return Color.GRAY;
@@ -865,6 +987,10 @@ public class MainMenuController implements Initializable {
         return Color.CRIMSON;
     }
 
+    /**
+     * Dibuja encima del mapa todas las anotaciones asociadas a la actividad, tales como 
+     * etiquetas de texto, puntos fijos, líneas y círculos.
+     */
     private void drawAnnotations(Activity activity) {
         for (Annotation ann : activity.getAnnotations()) {
             List<GeoPoint> geoPoints = ann.getGeoPoints();
@@ -904,6 +1030,10 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    /**
+     * Calcula la posición visual del punto de inicio de la ruta y anima las barras
+     * de scroll del mapa para asegurar que quede enfocado automáticamente en el centro de la pantalla.
+     */
     private void centerOnActivityStart(Activity activity) {
         TrackPoint start = activity.getStartPoint();
         if (start == null || mapPane == null || zoomGroup == null) {
@@ -928,6 +1058,10 @@ public class MainMenuController implements Initializable {
         timeline.play();
     }
 
+    /**
+     * Muestra un cuadro de diálogo pidiendo los datos de una nueva anotación (texto y color)
+     * para tipos de anotación que solo requieren de un único punto (puntos o texto flotante).
+     */
     private void addAnnotationFromClick(AnnotationType type, double x, double y) {
         GeoPoint point = projection.unproject(x, y);
         Dialog<AnnotationDraft> dialog = new Dialog<>();
@@ -943,6 +1077,10 @@ public class MainMenuController implements Initializable {
         result.ifPresent(draft -> saveAnnotation(type, draft.text(), draft.color(), List.of(point)));
     }
 
+    /**
+     * Inicia el proceso de dos pasos para crear anotaciones de áreas (círculos o líneas).
+     * Guarda el primer punto pulsado, pide el estilo, y configura el cursor a la espera de un segundo clic.
+     */
     private void startTwoPointAnnotation(AnnotationType type, double x, double y) {
         Dialog<AnnotationDraft> dialog = new Dialog<>();
         dialog.setTitle("Nueva anotación");
@@ -965,6 +1103,10 @@ public class MainMenuController implements Initializable {
         showInfo("Haz clic izquierdo para marcar el segundo punto de la anotación.");
     }
 
+    /**
+     * Persiste la anotación en los datos de la actividad y fuerza un repintado del mapa
+     * para que la nueva anotación se haga visible inmediatamente.
+     */
     private void saveAnnotation(AnnotationType type, String text, String color, List<GeoPoint> points) {
         if (currentActivity == null) {
             return;
@@ -976,6 +1118,10 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    /**
+     * Carga todos los datos personales del usuario logueado en los campos de texto
+     * e imágenes del panel "Ajustes de Perfil".
+     */
     private void loadProfileData() {
         User current = app.getCurrentUser();
         if (current == null) {
@@ -1004,6 +1150,10 @@ public class MainMenuController implements Initializable {
         if (dpFecha != null) dpFecha.setStyle("");
     }
 
+    /**
+     * Convierte un objeto de tipo Duration en un String legible por el usuario
+     * separando las horas, los minutos y los segundos (ej: 1h 20m).
+     */
     private String formatDuration(Duration duration) {
         if (duration == null) {
             return "0s";
@@ -1021,6 +1171,10 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    /**
+     * Recorre todas las sesiones de uso (logins) del usuario para sumar su duración y
+     * rellenar gráficamente el panel del Historial de Sesiones (tarjetas de resumen).
+     */
     private void showSessionSummary() {
         User current = app.getCurrentUser();
         if (current == null) {
@@ -1083,6 +1237,10 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    /**
+     * Oculta el listado maestro de actividades y rellena el panel de Detalles
+     * con la información completa (distancia, desnivel, velocidad) de una actividad.
+     */
     private void populateDetailView(Activity activity) {
         if (activity == null) {
             detailView.setVisible(false);
@@ -1101,16 +1259,28 @@ public class MainMenuController implements Initializable {
         detailView.setVisible(true);
     }
 
+    /**
+     * Oculta la vista de detalles y vuelve a mostrar el listado principal de actividades ("MIS RUTAS").
+     */
     @FXML
     private void volverAlMaster(javafx.event.ActionEvent event) {
         detailView.setVisible(false);
         masterView.setVisible(true);
     }
 
+    /**
+     * Obtiene la lista completa de mapas instalados en el sistema y los carga
+     * en el ListView del gestor de mapas.
+     */
     private void loadMapRegions() {
         mapRegionsList.getItems().setAll(app.getMapRegions());
     }
 
+    /**
+     * Crea un gráfico (LineChart) representando el perfil de altitud de la actividad seleccionada.
+     * Incorpora oyentes (listeners) del ratón para crear un "marcador interactivo" que
+     * relaciona la posición en la gráfica con su ubicación real en el mapa.
+     */
     private void showElevationProfile(Activity activity) {
         if (activity == null || activity.getTrackPoints().isEmpty()) {
             return;
@@ -1143,7 +1313,7 @@ public class MainMenuController implements Initializable {
         if (mapPane != null) {
             mapPane.getChildren().add(hoverPointMarker);
         }
-//aqui esta la tabla
+        //aqui esta la tabla
         chart.setOnMouseMoved(e -> {
             if (projection == null || mapPane == null) {
                 return;
@@ -1177,6 +1347,9 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    /**
+     * Elimina el componente de la gráfica de elevación de la pantalla, liberando ese espacio.
+     */
     @FXML
     private void ocultarGrafica(javafx.event.ActionEvent event) {
         if (mapAndChartSplitPane != null && vboxElevationProfile != null) {
@@ -1188,6 +1361,10 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    /**
+     * Recibe una distancia en kilómetros (obtenida del puntero del ratón en la gráfica) y
+     * busca cuál es el índice del TrackPoint más cercano a esa distancia en la ruta real.
+     */
     private int nearestTrackPointIndex(List<TrackPoint> points, double km) {
         double accMeters = 0;
         int bestIndex = -1;
@@ -1205,6 +1382,10 @@ public class MainMenuController implements Initializable {
         return bestIndex;
     }
 
+    /**
+     * Método auxiliar que convierte un objeto Color de JavaFX a un String
+     * de color en formato hexadecimal (por ejemplo: "#FF0000").
+     */
     private String toHex(Color c) {
         int r = (int) Math.round(c.getRed() * 255);
         int g = (int) Math.round(c.getGreen() * 255);
@@ -1212,6 +1393,10 @@ public class MainMenuController implements Initializable {
         return String.format("#%02X%02X%02X", r, g, b);
     }
 
+    /**
+     * Clase estática auxiliar (Data Transfer Object) para almacenar temporalmente
+     * la información que el usuario introduce en el cuadro de diálogo de crear una anotación.
+     */
     private static class AnnotationDraft {
         private final String text;
         private final String color;
@@ -1230,6 +1415,10 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    /**
+     * Valida de manera segura si el texto introducido por el usuario es un número decimal válido.
+     * Retorna verdadero si no da error de formato; falso en caso contrario o si está vacío.
+     */
     private boolean isDouble(String value) {
         if (value == null || value.trim().isEmpty()) {
             return false;
@@ -1242,6 +1431,10 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    /**
+     * Muestra una ventana emergente rápida de información o alerta en pantalla.
+     * Es útil para notificar al usuario sobre el éxito o fracaso de sus acciones.
+     */
     private void showInfo(String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setHeaderText(null);

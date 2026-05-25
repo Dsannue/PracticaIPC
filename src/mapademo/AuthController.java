@@ -117,7 +117,12 @@ public class AuthController {
         labelErrDate.setVisible(false);
         labelLogErr.setVisible(false);
     }
-
+    
+    /**
+     * Alterna la interfaz para mostrar el formulario de Inicio de Sesión (Login).
+     * Además, limpia por seguridad todos los campos que el usuario pudiera haber
+     * rellenado a medias en el formulario de registro.
+     */
     @FXML
     void mostrarLogin(ActionEvent event) {
         enableLog.set(Boolean.TRUE);
@@ -136,6 +141,10 @@ public class AuthController {
         validDate.set(false);
     }
     
+    /**
+     * Alterna la interfaz para mostrar el formulario de Registro.
+     * Limpia los campos de inicio de sesión y oculta sus posibles mensajes de error.
+     */
     @FXML
     void mostrarReg(ActionEvent event) {
         enableLog.set(Boolean.FALSE);
@@ -144,12 +153,21 @@ public class AuthController {
         labelLogErr.setVisible(false);
     }
 
+    /**
+     * Método auxiliar para proporcionar feedback visual al usuario.
+     * Si un campo no es válido ('valor' es false), muestra un mensaje de texto explicativo
+     * debajo del campo y tiñe el fondo del cuadro de texto de un color rojizo.
+     */
     private void showError(boolean valor, Node nodo, Label labelError, String message) {
         labelError.setText(message);
         labelError.setVisible(!valor);
         nodo.setStyle(((valor) ? "" : "-fx-background-color: #FCE5E0; -fx-background-radius: 25; -fx-border-radius: 10"));
     }
 
+    /**
+     * Comprueba si el nombre de usuario (Nickname) introducido en el registro es válido.
+     * Verifica que cumpla con los requisitos mínimos y que NO exista ya en la base de datos.
+     */
     private void checkUser() {
         boolean ok = User.checkNickName(txtRegUser.getText());
         if (ok && SportActivityApp.getInstance().nickNameExists(txtRegUser.getText().trim())) {
@@ -161,22 +179,38 @@ public class AuthController {
         validUser.set(ok);
     }
 
+    /**
+     * Comprueba si la contraseña introducida en el registro cumple con los estándares
+     * de seguridad exigidos (al menos una mayúscula, minúscula, número, símbolo y longitud correcta).
+     */
     private void checkPass() {
         String pass = txtRegPass.getText() == null ? "" : txtRegPass.getText().trim();
         validPass.set(User.checkPassword(pass) || isPasswordValidBySpec(pass));
         showError(validPass.get(), txtRegPass, labelErrPass, "Contraseña inválida (8-20 con may/min/número/símbolo)");
     }
 
+    /**
+     * Verifica que el correo electrónico introducido tenga un formato estándar válido.
+     */
     private void checkEmail() {
         validEmail.set(User.checkEmail(txtRegEmail.getText()));
         showError(validEmail.get(), txtRegEmail, labelErrEmail, "Email inválido");
     }
 
+    /**
+     * Verifica la fecha de nacimiento introducida. El sistema requiere que
+     * el usuario tenga como mínimo 12 años de edad para poder registrarse.
+     */
     private void checkDate() {
         validDate.set(txtRegDate.getValue() != null && User.isOlderThan(txtRegDate.getValue(), 12));
         showError(validDate.get(), txtRegDate, labelErrDate, "Debes ser mayor de 12 años");
     }
 
+    /**
+     * Se ejecuta al pulsar el botón "Autentificar". Intenta iniciar sesión con las
+     * credenciales dadas. Si tiene éxito, carga la ventana principal de la aplicación.
+     * Si falla, muestra un error visual advirtiendo de credenciales incorrectas.
+     */
     @FXML
     private void pasarAlMenu(ActionEvent event) throws IOException {
         SportActivityApp app = SportActivityApp.getInstance();
@@ -202,7 +236,12 @@ public class AuthController {
             labelLogErr.setVisible(true);
         }
     }
-
+    
+    /**
+     * Se ejecuta al pulsar "Registrarse". Recoge los datos de todos los campos, intenta
+     * crear un nuevo usuario en el sistema y, si lo consigue, devuelve al usuario a la 
+     * pantalla de Login para que inicie sesión.
+     */
     @FXML
     private void registrarUsuario(ActionEvent event) {
         SportActivityApp app = SportActivityApp.getInstance();
@@ -224,6 +263,11 @@ public class AuthController {
         }
     }
 
+    /**
+     * Método auxiliar que utiliza una Expresión Regular (Regex) para validar de 
+     * forma estricta que la contraseña cumpla los patrones de seguridad dictados
+     * por las especificaciones de la aplicación.
+     */
     private boolean isPasswordValidBySpec(String pass) {
         if (pass == null) {
             return false;
@@ -231,6 +275,10 @@ public class AuthController {
         return pass.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%&*()_\\-+=]).{8,20}$");
     }
 
+    /**
+     * Abre un cuadro de diálogo del sistema operativo (FileChooser) para permitir 
+     * al usuario seleccionar una imagen desde su ordenador como avatar personal.
+     */
     @FXML
     private void seleccionarRegAvatar(ActionEvent event) {
         FileChooser fc = new FileChooser();
