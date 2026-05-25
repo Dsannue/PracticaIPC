@@ -823,26 +823,30 @@ public class MainMenuController implements Initializable {
      */
     @FXML
     private void verAcumulado(ActionEvent event) {
-        cambioPestaña.set(4);
-        List<Activity> acts = app.getUserActivities();
-        double dist = 0;
-        double gain = 0;
-        double loss = 0;
-        Duration total = Duration.ZERO;
-        for (Activity a : acts) {
-            dist += a.getTotalDistance();
-            gain += a.getElevationGain();
-            loss += a.getElevationLoss();
-            total = total.plus(a.getDuration());
-        }
-        labelDistanciaAcumulado.setText("" + dist);
-        labelTiempoAcumulado.setText("" + total);
-        labelDesnivelAcumulado.setText("" + (gain - loss));
-        labelRutasAcumulado.setText("" + acts.size());
-        
-        //showInfo(String.format("Actividades: %d\nDistancia: %.2f km\nTiempo: %s\nDesnivel+: %.0f m\nDesnivel-: %.0f m",
-                //acts.size(), dist / 1000.0, total, gain, loss));
+    cambioPestaña.set(4);
+    List<Activity> acts = app.getUserActivities();
+    double dist = 0;
+    double gain = 0;
+    double loss = 0;
+    Duration total = Duration.ZERO;
+
+    for (Activity a : acts) {
+        dist += a.getTotalDistance();
+        gain += a.getElevationGain();
+        loss += a.getElevationLoss();
+        total = total.plus(a.getDuration());
     }
+
+    long segundosTotales = total.getSeconds();
+    long horas = segundosTotales / 3600;
+    long minutos = (segundosTotales % 3600) / 60;
+    long segundos = segundosTotales % 60;
+
+    labelDistanciaAcumulado.setText(String.format("%.2f km", dist / 1000));
+    labelTiempoAcumulado.setText(String.format("%02d:%02d:%02d", horas, minutos, segundos));
+    labelDesnivelAcumulado.setText(String.format("%.0f m", gain - loss));
+    labelRutasAcumulado.setText(String.format("%d", acts.size()));
+}
 
     /**
      * Borra el mapa seleccionado del sistema, siempre y cuando no esté siendo 
