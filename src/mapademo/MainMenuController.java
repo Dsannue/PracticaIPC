@@ -1083,7 +1083,7 @@ private void quitarEsto(Annotation anotacion, MouseEvent e) {
     ContextMenu menu = new ContextMenu();
     MenuItem opcionBorrar = new MenuItem("🗑 Quitar anotación");
     opcionBorrar.setOnAction(ev -> {
-        boolean confirmado = confirmAction("/FXMLFiles/FXMLDoubleCheckDelete.fxml");
+        boolean confirmado = confirmAction("/FXMLFiles/FXMLDoubleCheckDeleteAnn.fxml");
         if (confirmado) {
             app.removeAnnotation(anotacion);
 
