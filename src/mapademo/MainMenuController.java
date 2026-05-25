@@ -1014,48 +1014,97 @@ public class MainMenuController implements Initializable {
         return Color.CRIMSON;
     }
 
-    /**
-     * Dibuja encima del mapa todas las anotaciones asociadas a la actividad, tales como 
-     * etiquetas de texto, puntos fijos, líneas y círculos.
-     */
+   // En drawAnnotations, cambia todas las llamadas:
+    // deleteAnnotation(ann, e)  →  quitarEsto(ann, e)
+
     private void drawAnnotations(Activity activity) {
-        for (Annotation ann : activity.getAnnotations()) {
-            List<GeoPoint> geoPoints = ann.getGeoPoints();
-            if (geoPoints.isEmpty()) {
-                continue;
-            }
-            Color color = Color.web(ann.getColor() == null ? "#E74C3C" : ann.getColor());
+         for (Annotation ann : activity.getAnnotations()) {
+                List<GeoPoint> geoPoints = ann.getGeoPoints();
+             if (geoPoints.isEmpty()) continue;
+
+                Color color = Color.web(ann.getColor() == null ? "#E74C3C" : ann.getColor());
+
             if (ann.getType() == AnnotationType.POINT) {
-                Point2D p = projection.project(geoPoints.get(0));
-                Circle c = new Circle(p.getX(), p.getY(), 6, color);
-                mapPane.getChildren().add(c);
-                if (ann.getText() != null && !ann.getText().isBlank()) {
-                    Text t = new Text(p.getX() + 8, p.getY() - 8, ann.getText());
-                    mapPane.getChildren().add(t);
-                }
-            } else if (ann.getType() == AnnotationType.TEXT) {
-                Point2D p = projection.project(geoPoints.get(0));
-                Text t = new Text(p.getX(), p.getY(), ann.getText());
-                t.setFill(color);
+            Point2D p = projection.project(geoPoints.get(0));
+            Circle c = new Circle(p.getX(), p.getY(), 6, color);
+            c.setOnMouseClicked(e -> {
+                if (e.getButton() == MouseButton.SECONDARY) quitarEsto(ann, e);
+                e.consume();
+            });
+            mapPane.getChildren().add(c);
+            if (ann.getText() != null && !ann.getText().isBlank()) {
+                Text t = new Text(p.getX() + 8, p.getY() - 8, ann.getText());
                 mapPane.getChildren().add(t);
-            } else if (ann.getType() == AnnotationType.LINE && geoPoints.size() >= 2) {
-                Point2D p1 = projection.project(geoPoints.get(0));
-                Point2D p2 = projection.project(geoPoints.get(1));
-                Line line = new Line(p1.getX(), p1.getY(), p2.getX(), p2.getY());
-                line.setStroke(color);
-                line.setStrokeWidth(Math.max(1.0, ann.getStrokeWidth()));
-                mapPane.getChildren().add(line);
-            } else if (ann.getType() == AnnotationType.CIRCLE && geoPoints.size() >= 2) {
-                Point2D c = projection.project(geoPoints.get(0));
-                Point2D b = projection.project(geoPoints.get(1));
-                Circle circle = new Circle(c.getX(), c.getY(), c.distance(b));
-                circle.setStroke(color);
-                circle.setFill(Color.TRANSPARENT);
-                circle.setStrokeWidth(Math.max(1.0, ann.getStrokeWidth()));
-                mapPane.getChildren().add(circle);
             }
+
+        } else if (ann.getType() == AnnotationType.TEXT) {
+            Point2D p = projection.project(geoPoints.get(0));
+            Text t = new Text(p.getX(), p.getY(), ann.getText());
+            t.setFill(color);
+            t.setOnMouseClicked(e -> {
+                if (e.getButton() == MouseButton.SECONDARY) quitarEsto(ann, e);
+                e.consume();
+            });
+            mapPane.getChildren().add(t);
+
+        } else if (ann.getType() == AnnotationType.LINE && geoPoints.size() >= 2) {
+            Point2D p1 = projection.project(geoPoints.get(0));
+            Point2D p2 = projection.project(geoPoints.get(1));
+            Line line = new Line(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+            line.setStroke(color);
+            line.setStrokeWidth(Math.max(1.0, ann.getStrokeWidth()));
+            line.setPickOnBounds(false);
+            line.setOnMouseClicked(e -> {
+                if (e.getButton() == MouseButton.SECONDARY) quitarEsto(ann, e);
+                e.consume();
+            });
+            mapPane.getChildren().add(line);
+
+        } else if (ann.getType() == AnnotationType.CIRCLE && geoPoints.size() >= 2) {
+            Point2D c = projection.project(geoPoints.get(0));
+            Point2D b = projection.project(geoPoints.get(1));
+            Circle circulo = new Circle(c.getX(), c.getY(), c.distance(b));
+            circulo.setStroke(color);
+            circulo.setFill(Color.TRANSPARENT);
+            circulo.setStrokeWidth(Math.max(1.0, ann.getStrokeWidth()));
+            circulo.setOnMouseClicked(e -> {
+                if (e.getButton() == MouseButton.SECONDARY) quitarEsto(ann, e);
+                e.consume();
+            });
+            mapPane.getChildren().add(circulo);
         }
     }
+}
+
+/**
+ * Sale un menú al hacer clic derecho en una anotación para poder borrarla.
+ */
+private void quitarEsto(Annotation anotacion, MouseEvent e) {
+    ContextMenu menu = new ContextMenu();
+    MenuItem opcionBorrar = new MenuItem("🗑 Quitar anotación");
+    opcionBorrar.setOnAction(ev -> {
+        boolean confirmado = confirmAction("/FXMLFiles/FXMLDoubleCheckDelete.fxml");
+        if (confirmado) {
+            app.removeAnnotation(anotacion);
+
+            List<Activity> actividades = app.getUserActivities();
+            map_listview.getItems().setAll(actividades);
+
+            Activity fresca = actividades.stream()
+                .filter(a -> a.getId() == currentActivity.getId())
+                .findFirst()
+                .orElse(null);
+
+            if (fresca != null) {
+                map_listview.getSelectionModel().select(fresca);
+            }
+
+            renderActivity(fresca);
+        }
+    });
+    menu.getItems().add(opcionBorrar);
+    menu.show(mapPane.getScene().getWindow(), e.getScreenX(), e.getScreenY());
+}
 
     /**
      * Calcula la posición visual del punto de inicio de la ruta y anima las barras
