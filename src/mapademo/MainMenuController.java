@@ -53,6 +53,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import java.time.format.DateTimeFormatter;
+import javafx.event.ActionEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
@@ -216,6 +217,7 @@ public class MainMenuController implements Initializable {
     @FXML
     private TextField txtCoord4;
     
+    @FXML
     private Button btnVolverDesdeAñadirMapa;
     @FXML
     private MenuItem btnLogOut;
@@ -223,6 +225,20 @@ public class MainMenuController implements Initializable {
     private MenuItem btnprofileMod;
     @FXML
     private MenuItem btnHistorialSesion;
+    @FXML
+    private VBox menuAcumulado;
+    @FXML
+    private Label labelDesnivelAcumulado;
+    @FXML
+    private Label labelDistanciaAcumulado;
+    @FXML
+    private Label labelRutasAcumulado;
+    @FXML
+    private Label labelTiempoAcumulado;
+    @FXML
+    private Button btnVolverDesdeAcumulado;
+    @FXML
+    private Button btnCerrarGrafica;
     
     /**
      * Aumenta el nivel de zoom del mapa al pulsar el botón "+".
@@ -340,7 +356,6 @@ public class MainMenuController implements Initializable {
         );
     }
 
-    @FXML
     public void initialize(URL url, ResourceBundle rb) {
         zoom_slider.setMin(0.5);
         zoom_slider.setMax(1.5);
@@ -371,11 +386,13 @@ public class MainMenuController implements Initializable {
         menuGestionMapas.visibleProperty().bind(Bindings.equal(1, cambioPestaña));
         menuModPerfil.visibleProperty().bind(Bindings.equal(2, cambioPestaña));
         menuHistorial.visibleProperty().bind(Bindings.equal(3, cambioPestaña));
+        menuAcumulado.visibleProperty().bind(Bindings.equal(4,cambioPestaña));
 
         menuMapa.managedProperty().bind(menuMapa.visibleProperty());
         menuGestionMapas.managedProperty().bind(menuGestionMapas.visibleProperty());
         menuModPerfil.managedProperty().bind(menuModPerfil.visibleProperty());
         menuHistorial.managedProperty().bind(menuHistorial.visibleProperty());
+        menuAcumulado.managedProperty().bind(menuAcumulado.visibleProperty());
 
         detailView.managedProperty().bind(detailView.visibleProperty());
         masterView.managedProperty().bind(masterView.visibleProperty());
@@ -805,7 +822,8 @@ public class MainMenuController implements Initializable {
      * sumando todas sus actividades y muestra un cuadro de diálogo con el resumen.
      */
     @FXML
-    private void verAcumulado(javafx.event.ActionEvent event) {
+    private void verAcumulado(ActionEvent event) {
+        cambioPestaña.set(4);
         List<Activity> acts = app.getUserActivities();
         double dist = 0;
         double gain = 0;
@@ -817,8 +835,13 @@ public class MainMenuController implements Initializable {
             loss += a.getElevationLoss();
             total = total.plus(a.getDuration());
         }
-        showInfo(String.format("Actividades: %d\nDistancia: %.2f km\nTiempo: %s\nDesnivel+: %.0f m\nDesnivel-: %.0f m",
-                acts.size(), dist / 1000.0, total, gain, loss));
+        labelDistanciaAcumulado.setText("" + dist);
+        labelTiempoAcumulado.setText("" + total);
+        labelDesnivelAcumulado.setText("" + (gain - loss));
+        labelRutasAcumulado.setText("" + acts.size());
+        
+        //showInfo(String.format("Actividades: %d\nDistancia: %.2f km\nTiempo: %s\nDesnivel+: %.0f m\nDesnivel-: %.0f m",
+                //acts.size(), dist / 1000.0, total, gain, loss));
     }
 
     /**
@@ -1440,5 +1463,10 @@ public class MainMenuController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(msg);
         alert.showAndWait();
+    }
+    
+    @FXML
+    void volverDesdeAcumulado(ActionEvent event) {
+        cambioPestaña.set(0);
     }
 }
